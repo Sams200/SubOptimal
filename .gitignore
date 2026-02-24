@@ -1,4 +1,4 @@
 .idea
 cmake*
-models/*
+models/ggml-*.bin
 plan.txt

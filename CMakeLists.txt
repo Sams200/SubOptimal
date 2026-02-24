@@ -5,6 +5,14 @@ set(CMAKE_C_STANDARD 23)
 
 add_subdirectory(whisper.cpp)
 
+# download the model
+add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/models/ggml-base.en.bin
+    COMMAND bash ${CMAKE_SOURCE_DIR}/whisper.cpp/models/download-ggml-model.sh
+            base.en ${CMAKE_SOURCE_DIR}/models
+    COMMENT "Downloading whisper base.en model..."
+)
+
 # embed the model
 add_custom_command(
     OUTPUT model.o

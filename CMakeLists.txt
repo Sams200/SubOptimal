@@ -3,7 +3,12 @@ project(SubOptimal C CXX)
 
 set(CMAKE_C_STANDARD 23)
 
+# link whisper and ggml statically
+set(WHISPER_SHARED OFF CACHE BOOL "" FORCE)
+set(GGML_SHARED OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(whisper.cpp)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 
 # download the model
 add_custom_command(

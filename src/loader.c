@@ -16,13 +16,17 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
     pid_t pid;
 
     if(pipe(pipefd) < 0){
-        perror("pipe");
+        perror("LOADER: Could not open pipe");
+        close(pipefd[0]);
+        close(pipefd[1]);
         return NULL;
     }
 
     pid = fork();
     if(pid < 0){
-        perror("fork");
+        perror("LOADER: Could not fork process");
+        close(pipefd[0]);
+        close(pipefd[1]);
         return NULL;
     }
 
@@ -38,7 +42,7 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
         execlp("ffmpeg", "ffmpeg", "-i", video_path, "-f", "wav", "-ar", "16000", "-ac", "1", "-", NULL);
 
         // should not reach here
-        perror("execlp ffmpeg");
+        perror("LOADER: Could not execute ffmpeg");
         exit(1);
     }
 

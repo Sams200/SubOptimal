@@ -10,8 +10,6 @@ extern const unsigned char _binary_ggml_base_en_bin_start[];
 extern const unsigned char _binary_ggml_base_en_bin_end[];
 
 int main(void){
-    printf("Hello, World!\n");
-
     size_t model_size = (size_t)(_binary_ggml_base_en_bin_end - _binary_ggml_base_en_bin_start);
     printf("Embedded model size: %zu MiB\n", model_size/(1024*1024));
 
@@ -20,7 +18,7 @@ int main(void){
         model_size
     );
     if(ctx==NULL){
-        fprintf(stderr, "Error: Failed to load embedded model\n");
+        fprintf(stderr, "MAIN: Failed to load embedded model\n");
         exit(1);
     }
 

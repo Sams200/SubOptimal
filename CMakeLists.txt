@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ThesisProject C CXX)
+project(SubOptimal C CXX)
 
 set(CMAKE_C_STANDARD 23)
 
@@ -25,15 +25,15 @@ add_custom_command(
 add_library(embedded_model STATIC model.o)
 set_target_properties(embedded_model PROPERTIES LINKER_LANGUAGE C)
 
-add_executable(thesis_app
+add_executable(sub_optimal_app
     src/main.c
     src/loader.c
     src/loader.h
 )
 
-target_link_libraries(thesis_app PRIVATE whisper embedded_model)
+target_link_libraries(sub_optimal_app PRIVATE whisper embedded_model)
 
-target_include_directories(thesis_app PRIVATE
+target_include_directories(sub_optimal_app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/whisper.cpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )

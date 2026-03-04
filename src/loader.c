@@ -19,7 +19,7 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
         perror("LOADER: Could not open pipe");
         close(pipefd[0]);
         close(pipefd[1]);
-        return NULL;
+        exit(1);
     }
 
     pid = fork();
@@ -27,7 +27,7 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
         perror("LOADER: Could not fork process");
         close(pipefd[0]);
         close(pipefd[1]);
-        return NULL;
+        exit(1);
     }
 
     if(pid == 0){
@@ -39,7 +39,7 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
         close(pipefd[1]);
 
         // ac means 1 channel (mono) since whisper wants that
-        execlp("ffmpeg", "ffmpeg", "-i", video_path, "-f", "wav", "-ar", "16000", "-ac", "1", "-", NULL);
+        execlp("ffmpeg", "ffmpeg", "-loglevel", "warning", "-i", video_path, "-f", "wav", "-ar", "16000", "-ac", "1", "-", NULL);
 
         // should not reach here
         perror("LOADER: Could not execute ffmpeg");

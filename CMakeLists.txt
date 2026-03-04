@@ -10,33 +10,20 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(whisper.cpp)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 
-# download the model
-add_custom_command(
-    OUTPUT ${CMAKE_SOURCE_DIR}/models/ggml-base.en.bin
-    COMMAND bash ${CMAKE_SOURCE_DIR}/whisper.cpp/models/download-ggml-model.sh
-            base.en ${CMAKE_SOURCE_DIR}/models
-    COMMENT "Downloading whisper base.en model..."
-)
-
-# embed the model
-add_custom_command(
-    OUTPUT model.o
-    COMMAND ld -r -b binary -o ${CMAKE_CURRENT_BINARY_DIR}/model.o ggml-base.en.bin
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/models
-    DEPENDS ${CMAKE_SOURCE_DIR}/models/ggml-base.en.bin
-    COMMENT "Embedding model into binary object"
-)
-
-add_library(embedded_model STATIC model.o)
-set_target_properties(embedded_model PROPERTIES LINKER_LANGUAGE C)
-
 add_executable(sub_optimal_app
     src/main.c
     src/loader.c
     src/loader.h
+src/parser.c
+src/parser.h
+src/defaults.h
+src/transcribe.c
+src/transcribe.h
+src/file_helpers.c
+src/file_helpers.h
 )
 
-target_link_libraries(sub_optimal_app PRIVATE whisper embedded_model)
+target_link_libraries(sub_optimal_app PRIVATE whisper)
 
 target_include_directories(sub_optimal_app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/whisper.cpp/include

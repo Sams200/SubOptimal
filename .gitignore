@@ -2,3 +2,4 @@
 cmake*
 models/ggml-*.bin
 plan.txt
+.directory

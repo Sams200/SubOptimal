@@ -81,7 +81,6 @@ int main(int argc, char *argv[]){
     wparams.new_segment_callback = whisper_log_cb;
     wparams.new_segment_callback_user_data = output_file;
     wparams.n_threads = 8;
-    wparams.language = "en";
 
     // perform inference
     printf("BEGIN TRANSCRIPT\n");

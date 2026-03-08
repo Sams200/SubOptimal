@@ -132,6 +132,7 @@ void whisper_log_cb(struct whisper_context *ctx, struct whisper_state *state, in
         int64_t t0 = whisper_full_get_segment_t0(ctx, i);
         int64_t t1 = whisper_full_get_segment_t1(ctx, i);
 
+        // add guards here
         g_segment_counter++;
 
         char t0_str[32], t1_str[32];

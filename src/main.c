@@ -62,11 +62,11 @@ int main(int argc, char *argv[]){
         model_path
     );
     if(ctx==NULL){
-        fprintf(stderr, "MAIN: Failed to load embedded model\n");
+        fprintf(stderr, "MAIN: Failed to load model %s\n", arguments.model);
         exit(1);
     }
 
-    printf("Model loaded successfully from embedded memory\n");
+    printf("Model %s loaded successfully\n", arguments.model);
 
     // open output file for writing
     FILE *output_file = fopen(arguments.output, "w");
@@ -81,6 +81,12 @@ int main(int argc, char *argv[]){
     wparams.new_segment_callback = whisper_log_cb;
     wparams.new_segment_callback_user_data = output_file;
     wparams.n_threads = 8;
+
+    // prevent repetition loops
+    wparams.n_max_text_ctx = 64;
+    wparams.entropy_thold = 2.8f;
+    wparams.suppress_blank = 1;
+    wparams.suppress_nst = 1;
 
     // perform inference
     printf("BEGIN TRANSCRIPT\n");

@@ -120,6 +120,8 @@ static void format_srt_timestamp(int64_t centiseconds, char* buffer){
             (long long)hours, (long long)minutes, (long long)seconds, (long long)ms);
 }
 
+
+static int g_segment_counter = 0;
 void whisper_log_cb(struct whisper_context *ctx, struct whisper_state *state, int n_new, void* user_data){
     FILE *output_file = (FILE *)user_data;
     const int n_segments = whisper_full_n_segments(ctx);
@@ -130,13 +132,15 @@ void whisper_log_cb(struct whisper_context *ctx, struct whisper_state *state, in
         int64_t t0 = whisper_full_get_segment_t0(ctx, i);
         int64_t t1 = whisper_full_get_segment_t1(ctx, i);
 
+        g_segment_counter++;
+
         char t0_str[32], t1_str[32];
         format_srt_timestamp(t0, t0_str);
         format_srt_timestamp(t1, t1_str);
 
         // format as SRT: segment_number, timestamp, text, blank line
         fprintf(stdout, "[%s --> %s] %s\n", t0_str, t1_str, text);
-        fprintf(output_file, "%d\n%s --> %s\n%s\n\n", i+1, t0_str, t1_str, text);
+        fprintf(output_file, "%d\n%s --> %s\n%s\n\n", g_segment_counter, t0_str, t1_str, text);
         fflush(output_file);
     }
 }

@@ -51,15 +51,17 @@ git submodule update --init --recursive
 | `-o`, `--output`   | Path to output SRT file |
 | `-m`, `--model`    | Whisper.cpp model to use |
 | `-c`, `--config`   | Path to YAML config file |
+| `-t`, `--translate` | Language to translate into |
 
 ### Available Models
 
 | Model | Size | Speed | Accuracy |
 |-------|------|-------|----------|
-| `ggml-tiny.en.bin` | 75 MB | Fastest | Basic |
-| `ggml-base.en.bin` | 142 MB | Fast | Good |
-| `ggml-small.en.bin` | 466 MB | Medium | Better |
-| `ggml-medium.en.bin` | 1.5 GB | Slow | High |
+| `ggml-tiny.bin` | 75 MB | Fastest | Basic |
+| `ggml-base.bin` | 142 MB | Fast | Good |
+| `ggml-small.bin` | 466 MB | Medium | Better |
+| `ggml-medium.bin` | 1.5 GB | Medium | High |
+| `ggml-large-v3-turbo.bin` | 1.5 GB | Large | Highest |
 
 English-only models (`.en.bin`) are more performant for English audio.
 

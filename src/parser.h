@@ -15,7 +15,7 @@ typedef enum {
     MODE_GUI
 } run_mode_t;
 
-typedef struct _arguments {
+typedef struct {
     run_mode_t  mode;
     const char *model;
     const char *source;

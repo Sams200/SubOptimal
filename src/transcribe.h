@@ -5,7 +5,6 @@
 #ifndef TRANSCRIBE_H
 #define TRANSCRIBE_H
 #include <stddef.h>
-#include <stdint.h>
 
 typedef struct {
     char t0[32];

@@ -11,7 +11,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
+#define DR_WAV_IMPLEMENTATION
+#include "dr_wav.h"
+
+static unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
     int pipefd[2]; // 0 - read; 1 - write
     pid_t pid;
 
@@ -39,7 +42,15 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
         close(pipefd[1]);
 
         // ac means 1 channel (mono) since whisper wants that
-        execlp("ffmpeg", "ffmpeg", "-loglevel", "warning", "-i", video_path, "-f", "wav", "-ar", "16000", "-ac", "1", "-", NULL);
+        // also include a filter to remove background music
+        execlp("ffmpeg", "ffmpeg",
+            "-loglevel", "warning",
+            "-i", video_path,
+            "-af", "highpass=f=150,lowpass=f=4500",
+            "-f", "wav",
+            "-ar", "16000",
+            "-ac", "1",
+            "-", NULL);
 
         // should not reach here
         perror("LOADER: Could not execute ffmpeg");
@@ -79,4 +90,44 @@ unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
     waitpid(pid, NULL, 0);
     *size_out = size;
     return buffer;
+}
+
+float* load_audio(const char* source, size_t* frame_count_out){
+    size_t wav_size;
+    unsigned char* wav_data = load_audio_via_ffmpeg(source, &wav_size);
+
+    if(!wav_data){
+        fprintf(stderr, "load_audio: Failed to load audio via ffmpeg\n");
+        return NULL;
+    }
+
+    drwav wav;
+    if(!drwav_init_memory(&wav, wav_data, wav_size, NULL)){
+        fprintf(stderr, "load_audio: Failed to initialize drwav\n");
+        free(wav_data);
+        return NULL;
+    }
+
+    if(wav.channels != 1){
+        fprintf(stderr, "load_audio: WAV channels must be 1\n");
+        drwav_uninit(&wav);
+        free(wav_data);
+        return NULL;
+    }
+
+    float* pcm_frames = malloc(wav.totalPCMFrameCount * wav.channels * sizeof(float));
+    if(!pcm_frames){
+        fprintf(stderr, "load_audio: Failed to allocate PCM buffer\n");
+        drwav_uninit(&wav);
+        free(wav_data);
+        return NULL;
+    }
+
+    drwav_read_pcm_frames_f32(&wav, wav.totalPCMFrameCount, pcm_frames);
+    *frame_count_out = wav.totalPCMFrameCount;
+
+    drwav_uninit(&wav);
+    free(wav_data);
+
+    return pcm_frames;
 }

@@ -15,20 +15,18 @@ typedef enum {
     MODE_GUI
 } run_mode_t;
 
-struct arguments {
+typedef struct _arguments {
     run_mode_t  mode;
     const char *model;
     const char *source;
     const char *output;
     const char *config;   // explicit --config path (headless only)
-};
-
-extern struct arguments arguments;
+}arguments;
 
 /*
- * Parse arguments and place them in the arguments global variable.
+ * Parse arguments. Allocate and return struct
  * Exits the process on error.
  */
-void parse_args(int argc, char *argv[]);
+arguments* parse_args(int argc, char *argv[]);
 
 #endif //PARSER_H

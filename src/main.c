@@ -24,13 +24,24 @@ int main(int argc, char *argv[]){
     }
 
     // transcribe audio
-    int result = transcribe(model_path, pcm_frames, frame_count, arguments->output, vad_path);
-    if(result != 0){
+    subtitle_list* list = transcribe(model_path, pcm_frames, frame_count, vad_path);
+    if(!list){
         exit(1);
     }
+    free(pcm_frames);
+
+    FILE* file = fopen(arguments->output, "w");
+    for(int i=0;i<list->count;i++){
+        fprintf(file, "%d\n%s --> %s\n%s\n\n",
+                i+1, list->segments[i].t0, list->segments[i].t1, list->segments[i].text);
+
+        free(list->segments[i].text);
+    }
+    free(list->segments);
+    free(list);
+    fclose(file);
 
     // cleanup
-    free(pcm_frames);
     free(arguments);
 
     return 0;

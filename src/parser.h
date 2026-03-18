@@ -21,6 +21,7 @@ typedef struct _arguments {
     const char *source;
     const char *output;
     const char *config;   // explicit --config path (headless only)
+    const char *translate;
 }arguments;
 
 /*

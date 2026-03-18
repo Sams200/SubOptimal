@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -143,25 +144,28 @@ static int g_segment_counter = 0;
 static void whisper_log_cb(struct whisper_context *ctx,
                            struct whisper_state *state,
                            int n_new, void* user_data){
-    FILE *output_file = (FILE *)user_data;
+    subtitle_list *list = (subtitle_list *)user_data;
     const int n_segments = whisper_full_n_segments(ctx);
     const int i = n_segments - 1;
 
-    if(i >= 0){
-        const char *text = whisper_full_get_segment_text(ctx, i);
+    if (i >= 0) {
+        // grow array if needed
+        if (list->count >= list->capacity) {
+            list->capacity = list->capacity ? list->capacity * 2 : 64;
+            list->segments = realloc(list->segments,
+                                     list->capacity * sizeof(subtitle_segment));
+        }
+
+        subtitle_segment *seg = &list->segments[list->count++];
         int64_t t0 = whisper_full_get_segment_t0(ctx, i) + g_chunk_offset_cs;
         int64_t t1 = whisper_full_get_segment_t1(ctx, i) + g_chunk_offset_cs;
 
-        g_segment_counter++;
+        format_srt_timestamp(t0, seg->t0);
+        format_srt_timestamp(t1, seg->t1);
+        seg->text = strdup(whisper_full_get_segment_text(ctx, i));
 
-        char t0_str[32], t1_str[32];
-        format_srt_timestamp(t0, t0_str);
-        format_srt_timestamp(t1, t1_str);
+        fprintf(stdout, "[%s --> %s] %s\n", seg->t0, seg->t1, seg->text);
 
-        fprintf(stdout, "[%s --> %s] %s\n", t0_str, t1_str, text);
-        fprintf(output_file, "%d\n%s --> %s\n%s\n\n",
-                g_segment_counter, t0_str, t1_str, text);
-        fflush(output_file);
     }
 }
 
@@ -173,28 +177,33 @@ static void whisper_silent_log_cb(enum ggml_log_level level,
     (void)user_data;
 }
 
-int transcribe(const char *model_path, const float *audio_data,
-               size_t audio_frames, const char *output_path, const char *vad_path){
+subtitle_list* transcribe(const char *model_path, const float *audio_data,
+               size_t audio_frames, const char *vad_path){
+    g_chunk_offset_cs = 0;
+
     // load model
     whisper_log_set(whisper_silent_log_cb, NULL);
     struct whisper_context* ctx = whisper_init_from_file(model_path);
     if(ctx == NULL){
         fprintf(stderr, "transcribe: Failed to load model %s\n", model_path);
-        return -1;
+        return NULL;
     }
 
-    // open output file for writing
-    FILE *output_file = fopen(output_path, "w");
-    if(!output_file){
-        fprintf(stderr, "transcribe: Failed to open output file %s\n", output_path);
+    subtitle_list *list = malloc(sizeof(subtitle_list));
+    if(list == NULL){
         whisper_free(ctx);
-        return -1;
+        return NULL;
     }
+
+    // initialize list
+    list->segments = NULL;
+    list->count = 0;
+    list->capacity = 0;
 
     // setup params
     struct whisper_full_params wparams = whisper_full_default_params(WHISPER_SAMPLING_BEAM_SEARCH);
     wparams.new_segment_callback = whisper_log_cb;
-    wparams.new_segment_callback_user_data = output_file;
+    wparams.new_segment_callback_user_data = list;
     wparams.n_threads = 8;
 
     // 5 beams running in parallel
@@ -240,7 +249,6 @@ int transcribe(const char *model_path, const float *audio_data,
         g_chunk_offset_cs = (int64_t)((offset + chunk_len) / (float)WHISPER_SAMPLE_RATE * 100);
     }
 
-    fclose(output_file);
     whisper_free(ctx);
-    return 0;
+    return list;
 }

@@ -25,9 +25,9 @@ static char doc[] =
 
 static char args_doc[] = "";
 
-static int is_valid_model(const char *name){
-    for (int i = 0; VALID_MODELS[i]; i++)
-        if (strncmp(VALID_MODELS[i], name, 20) == 0) return 1;
+static int is_valid_option(const char *name, const char* option_list[]){
+    for (int i = 0; option_list[i]; i++)
+        if (strncmp(option_list[i], name, 20) == 0) return 1;
     return 0;
 }
 
@@ -40,6 +40,7 @@ static struct argp_option options[] = {
     {"model",    'm', "MODEL",0, "Whisper.cpp model name (e.g., ggml-base.en.bin)"},
     {"source",   's', "FILE", 0, "Path to input mp4 file to transcribe"},
     {"output",   'o', "FILE", 0, "Path to output SRT file"},
+    {"translate",   't', "MODEL",  0, "Language to translate to"},
     {0}
 };
 
@@ -135,6 +136,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'm':
             arguments->model = arg;
             break;
+        case 't':
+            arguments->translate = arg;
+            break;
         case 's':
             arguments->source = arg;
             break;
@@ -188,7 +192,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
             }
 
             // validate model
-            if (!is_valid_model(arguments->model)) {
+            if (!is_valid_option(arguments->model,VALID_MODELS)) {
                 char msg[512] = "Unknown model '";
                 strncat(msg, arguments->model, sizeof(msg) - strlen(msg) - 1);
                 strncat(msg, "'. Valid models are:\n", sizeof(msg) - strlen(msg) - 1);
@@ -208,6 +212,18 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
 
                 argp_error(state, "%s", msg);
             }
+
+            // validate translate language
+            if (arguments->translate && !is_valid_option(arguments->translate, VALID_LANGUAGES)) {
+                fprintf(stderr, "Unknown language '%s'. Valid languages:\n", arguments->translate);
+
+                // print in columns: code - name
+                for (int i = 0; VALID_LANGUAGES[i]; i++) {
+                    fprintf(stderr, "  %s - %s\n", VALID_LANGUAGES[i], LANGUAGE_NAMES[i]);
+                }
+
+                exit(EXIT_FAILURE);
+            }
             break;
 
         default:
@@ -225,6 +241,18 @@ static struct argp argp = {
 
 arguments* parse_args(const int argc, char *argv[]) {
     arguments* arguments = malloc(sizeof(*arguments));
+    if (!arguments) {
+        perror("parse_args: malloc");
+        exit(EXIT_FAILURE);
+    }
+
+    // initialize all fields to NULL
+    arguments->model = NULL;
+    arguments->source = NULL;
+    arguments->output = NULL;
+    arguments->config = NULL;
+    arguments->translate = NULL;
+    arguments->mode = MODE_UNSET;
 
     if (argp_parse(&argp, argc, argv, 0, NULL, arguments) != 0)
         exit(EXIT_FAILURE);

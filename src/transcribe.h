@@ -5,7 +5,19 @@
 #ifndef TRANSCRIBE_H
 #define TRANSCRIBE_H
 #include <stddef.h>
-#include "parser.h"
+#include <stdint.h>
+
+typedef struct {
+    char t0[32];
+    char t1[32];
+    char *text;
+} subtitle_segment;
+
+typedef struct {
+    subtitle_segment *segments;
+    size_t count;
+    size_t capacity;
+} subtitle_list;
 
 /*
  * Ensure the whisper model and VAD model are present.
@@ -30,6 +42,6 @@ int ensure_model(const char *model_name, char *model_path, size_t path_size, cha
  *
  * Returns 0 on success, -1 on failure.
  */
-int transcribe(const char *model_path, const float *audio_data,
-               size_t audio_frames, const char *output_path, const char *vad_path);
+subtitle_list* transcribe(const char *model_path, const float *audio_data,
+               size_t audio_frames, const char *vad_path);
 #endif //TRANSCRIBE_H

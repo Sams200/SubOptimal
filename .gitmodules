@@ -1,3 +1,9 @@
 [submodule "whisper.cpp"]
 	path = whisper.cpp
 	url = https://github.com/ggml-org/whisper.cpp.git
+[submodule "ctranslate2"]
+	path = ctranslate2
+	url = https://github.com/OpenNMT/CTranslate2.git
+[submodule "sentencepiece"]
+	path = sentencepiece
+	url = https://github.com/google/sentencepiece.git

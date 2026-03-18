@@ -240,15 +240,6 @@ int transcribe(const char *model_path, const float *audio_data,
         g_chunk_offset_cs = (int64_t)((offset + chunk_len) / (float)WHISPER_SAMPLE_RATE * 100);
     }
 
-    // int result = whisper_full(ctx, wparams, audio_data, audio_frames);
-    //#define MAX_CHUNK_S 10.0f
-    // if(result != 0){
-    //     fprintf(stderr, "transcribe: whisper_full failed\n");
-    //     fclose(output_file);
-    //     whisper_free(ctx);
-    //     return -1;
-    // }
-
     fclose(output_file);
     whisper_free(ctx);
     return 0;

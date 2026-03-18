@@ -213,6 +213,14 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
                 argp_error(state, "%s", msg);
             }
 
+            // ensure translate model directory exists
+            const char *home = getenv("HOME");
+            if(home){
+                char translate_dir[PATH_MAX];
+                snprintf(translate_dir, sizeof(translate_dir), "%s%s", home, TRANSLATE_MODEL_DIR);
+                mkdirs_for_file(translate_dir);
+            }
+
             // validate translate language
             if (arguments->translate && !is_valid_option(arguments->translate, VALID_LANGUAGES)) {
                 fprintf(stderr, "Unknown language '%s'. Valid languages:\n", arguments->translate);

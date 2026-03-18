@@ -5,8 +5,84 @@
 #include "file_helpers.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+static int download_with_curl(const char *url, const char *dest_path){
+    pid_t pid = fork();
+
+    if(pid < 0){
+        perror("download_with_curl: fork");
+        return -1;
+    }
+
+    if(pid == 0){
+        // curl here
+        execlp("curl", "curl",
+               "-L",           // follow redirects
+               "-f",           // fail on HTTP error status
+               "-#",           // progress bar
+               "-o", dest_path,
+               url,
+               (char *)NULL);
+
+        // should not reach here
+        perror("download_with_curl: execlp curl");
+        _exit(127);
+    }
+
+    // parent
+    int status;
+    if (waitpid(pid, &status, 0) < 0) {
+        perror("download_with_curl: waitpid");
+        return -1;
+    }
+
+    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        fprintf(stderr, "curl exited with status %d\n", WEXITSTATUS(status));
+        return -1;
+    }
+
+    return 0;
+}
+
+int curl_if_not_present(const char *rel_path, const char *url){
+    const char *home = getenv("HOME");
+    if(!home){
+        fprintf(stderr, "curl_if_not_present: $HOME is not set\n");
+        return -1;
+    }
+
+    char full_path[PATH_MAX];
+    int written = snprintf(full_path, sizeof(full_path), "%s/%s", home, rel_path);
+    if(written < 0 || (size_t)written >= sizeof(full_path)){
+        fprintf(stderr, "curl_if_not_present: path too long\n");
+        return -1;
+    }
+
+    if(file_exists(full_path)){
+        return 0;  // already present
+    }
+
+    mkdirs_for_file(full_path);
+
+    fprintf(stdout, "Downloading %s from:\n  %s\n", rel_path, url);
+    fflush(stdout);
+
+    if(download_with_curl(url, full_path) != 0){
+        remove(full_path);
+        fprintf(stderr, "curl_if_not_present: failed to download '%s'\n", rel_path);
+        return -1;
+    }
+
+    fprintf(stdout, "\nSaved to: %s\n", full_path);
+    return 0;
+}
 
 void mkdirs_for_file(const char *filepath){
     char tmp[PATH_MAX];

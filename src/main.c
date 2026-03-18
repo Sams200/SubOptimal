@@ -50,7 +50,7 @@ subtitle_list* perform_transcribe(const char* model,const char* source){
 
     // transcribe audio
     subtitle_list* list = transcribe(model_path, pcm_frames, frame_count, vad_path);
-    if(!*list){
+    if(!list){
         free(pcm_frames);
         exit(1);
     }

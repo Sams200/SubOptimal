@@ -1,6 +1,6 @@
 # SubOptimal
 
-A fast, lightweight application for generating subtitles using whisper.cpp.
+A fast, lightweight application for generating subtitles using whisper.cpp. Translates subtitles using CTranslate2.
 
 ## Features
 

@@ -5,6 +5,8 @@
 #ifndef FILE_HELPERS_H
 #define FILE_HELPERS_H
 
+#include "defaults.h"
+
 void mkdirs_for_file(const char *filepath);
 int file_exists(const char *path);
 
@@ -18,5 +20,11 @@ int file_exists(const char *path);
  * Returns 0 on success (file exists or downloaded), -1 on failure.
  */
 int curl_if_not_present(const char *rel_path, const char *url);
+
+/*
+ * Find index of option in array terminated by END_OF_ARRAY.
+ * Matches first 20 characters. Skips NULL entries. Returns -1 if not found.
+ */
+int is_valid_option(const char *name, const char *option_list[]);
 
 #endif //FILE_HELPERS_H

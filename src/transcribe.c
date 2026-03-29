@@ -124,7 +124,7 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     // set language if provided by user, otherwise auto-detect
     if (language) {
         wparams.language = language;
-        printf("INPUT LANGUAGE: %s (user specified)\n", language);
+        list->language = language;
     } else {
         // detect language from audio at 60 seconds (skip typical anime intro ~1.5 min)
         int detect_offset_ms = 60000;
@@ -137,7 +137,7 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
                     const char *lang_str = whisper_lang_str(lang_id);
                     if (lang_str) {
                         wparams.language = lang_str;
-                        printf("DETECTED LANGUAGE: %s (id=%d) at %dms\n", lang_str, lang_id, detect_offset_ms);
+                        list->language = lang_str;
                     }
                 }
             }

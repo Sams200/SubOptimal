@@ -2,24 +2,44 @@
 #include <ctranslate2/translator.h>
 #include <sentencepiece_processor.h>
 #include <string>
+#include <vector>
 #include <cstring>
 #include <stdexcept>
+#include <cstdio>
+#include <sys/stat.h>
 
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;
 
-void translator_init(const char *model_path) {
-    // model_path should be the directory containing
-    // model.bin, tokenizer.model, etc.
+void translator_init(const char *model_path, const char *source_lang, const char *target_lang) {
+    // model_path should be the directory containing the model files
+    // Helsinki models: model.bin, source.spm, target.spm
+    // NLLB models: model.bin, sentencepiece.bpe.model
+
+    // Detect Helsinki model by checking for source.spm
+    bool is_helsinki = false;
+    char source_spm_path[4096];
+    snprintf(source_spm_path, sizeof(source_spm_path), "%s/source.spm", model_path);
+
+    struct stat st;
+    if (stat(source_spm_path, &st) == 0) {
+        is_helsinki = true;
+    }
+
     translator = new ctranslate2::Translator(
         model_path,
         ctranslate2::Device::CUDA,
         ctranslate2::ComputeType::DEFAULT,
-        {0}  // device indices
+        {0}
     );
 
-    // tokenizer.model ships alongside the NLLB model
-    std::string spm_path = std::string(model_path) + "sentencepiece.bpe.model";
+    std::string spm_path;
+    if (is_helsinki) {
+        spm_path = std::string(model_path) + "/target.spm";
+    } else {
+        spm_path = std::string(model_path) + "/sentencepiece.bpe.model";
+    }
+
     spp = new sentencepiece::SentencePieceProcessor();
     if (!spp->Load(spm_path).ok())
         throw std::runtime_error("Failed to load SentencePiece model");

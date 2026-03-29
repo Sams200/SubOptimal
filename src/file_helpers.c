@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -98,4 +99,17 @@ void mkdirs_for_file(const char *filepath){
 int file_exists(const char *path){
     struct stat st;
     return stat(path, &st) == 0 && S_ISREG(st.st_mode);
+}
+
+int is_valid_option(const char *name, const char* option_list[]){
+    if (name == NULL) return -1;
+    for (int i = 0; ; i++) {
+        const char *opt = option_list[i];
+        if (is_end_of_array(opt)) {
+            return -1;
+        }
+        if (opt == NULL) continue;
+        if (strncmp(opt, name, 20) == 0) return i;
+    }
+    return -1;
 }

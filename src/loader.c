@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 
 #define DR_WAV_IMPLEMENTATION
-#include "dr_wav.h"
+#include "../drwav/dr_wav.h"
 
 static unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size_out){
     int pipefd[2]; // 0 - read; 1 - write

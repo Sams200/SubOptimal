@@ -16,6 +16,7 @@ typedef struct {
     subtitle_segment *segments;
     size_t count;
     size_t capacity;
+    char* language;
 } subtitle_list;
 
 /*

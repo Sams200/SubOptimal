@@ -25,12 +25,6 @@ static char doc[] =
 
 static char args_doc[] = "";
 
-static int is_valid_option(const char *name, const char* option_list[]){
-    for (int i = 0; option_list[i]; i++)
-        if (strncmp(option_list[i], name, 20) == 0) return i;
-    return -1;
-}
-
 static struct argp_option options[] = {
     /* mode */
     {"headless", 'H', NULL,      0, "Run in headless (no-GUI) mode"},
@@ -202,13 +196,13 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
                 strncat(msg, arguments->model, sizeof(msg) - strlen(msg) - 1);
                 strncat(msg, "'. Valid models are:\n", sizeof(msg) - strlen(msg) - 1);
 
-                for (int i = 0; TRANSCRIBE_MODEL_NAMES[i]; i++) {
+                for (int i = 0; !is_end_of_array(TRANSCRIBE_MODEL_NAMES[i]); i++) {
                     if(i % 2 == 1){
                         strncat(msg, ", ", sizeof(msg) - strlen(msg) - 1);
                     }
                     strncat(msg, TRANSCRIBE_MODEL_NAMES[i], sizeof(msg) - strlen(msg) - 1);
                     if (i > 0 && (i + 1) % 2 == 0) {
-                        if(TRANSCRIBE_MODEL_NAMES[i+1]){
+                        if(!is_end_of_array(TRANSCRIBE_MODEL_NAMES[i+1])){
                             strncat(msg, ",", sizeof(msg) - strlen(msg) - 1);
                         }
                         strncat(msg, "\n", sizeof(msg) - strlen(msg) - 1);
@@ -222,37 +216,47 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
             }
 
             // validate input language
-            int transcribe_language_index = is_valid_option(arguments->language, WHISPER_LANGUAGE_CODES);
-            if (arguments->language && transcribe_language_index < 0) {
-                fprintf(stderr, "Unknown transcribe language '%s'. Valid languages:\n", arguments->language);
+            if(arguments->language){
+                int transcribe_language_index = is_valid_option(arguments->language, WHISPER_LANGUAGE_CODES);
+                if(transcribe_language_index < 0){
+                    fprintf(stderr, "Unknown transcribe language '%s'. Valid languages:\n", arguments->language);
 
-                // print in columns: code - name
-                for (int i = 0; WHISPER_LANGUAGE_CODES[i]; i++) {
-                    fprintf(stderr, "  %3s - %s\n", WHISPER_LANGUAGE_CODES[i], WHISPER_LANGUAGE_NAMES[i]);
+                    // print in columns: code - name (skip NULL entries)
+                    for (int i = 0; !is_end_of_array(VALID_LANGUAGES[i]); i++) {
+                        if (WHISPER_LANGUAGE_CODES[i] != NULL) {
+                            fprintf(stderr, "  %3s - %s\n", WHISPER_LANGUAGE_CODES[i], WHISPER_LANGUAGE_NAMES[i]);
+                        }
+                    }
+
+                    exit(EXIT_FAILURE);
                 }
-
-                exit(EXIT_FAILURE);
             }
 
             // ensure translate model directory exists
             const char *home = getenv("HOME");
             if(home){
                 char translate_dir[PATH_MAX];
-                snprintf(translate_dir, sizeof(translate_dir), "%s%s", home, TRANSLATE_MODEL_DIR);
+                snprintf(translate_dir, sizeof(translate_dir), "%s%s", home, NLLB_MODEL_DIR);
                 mkdirs_for_file(translate_dir);
             }
 
             // validate translate language
-            if (arguments->translate && !is_valid_option(arguments->translate, VALID_LANGUAGES)) {
-                fprintf(stderr, "Unknown translate language '%s'. Valid languages:\n", arguments->translate);
+            if(arguments->translate){
+                int translate_index = is_valid_option(arguments->translate, VALID_LANGUAGES);
+                if(translate_index < 0){
+                    fprintf(stderr, "Unknown translate language '%s'. Valid languages:\n", arguments->translate);
 
-                // print in columns: code - name
-                for (int i = 0; VALID_LANGUAGES[i]; i++) {
-                    fprintf(stderr, "  %s - %s\n", VALID_LANGUAGES[i], LANGUAGE_NAMES[i]);
+                    // print in columns: code - name (skip NULL entries)
+                    for (int i = 0; VALID_LANGUAGES[i]; i++) {
+                        if (WHISPER_LANGUAGE_CODES[i] != NULL) {
+                            fprintf(stderr, "  %s - %s\n", VALID_LANGUAGES[i], LANGUAGE_NAMES[i]);
+                        }
+                    }
+
+                    exit(EXIT_FAILURE);
                 }
-
-                exit(EXIT_FAILURE);
             }
+
             break;
 
         default:

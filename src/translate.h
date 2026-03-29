@@ -9,8 +9,20 @@
 extern "C" {
 #endif
 
-    void translator_init(const char *model_path);
+    /*
+     * Initialize translator with model directory.
+     * model_path  - directory containing model files
+     * source_lang - source language code (e.g., "eng_Latn" or NLLB format)
+     * target_lang - target language code (e.g., "ron_Latn" or NLLB format)
+     */
+    void translator_init(const char *model_path, const char *source_lang, const char *target_lang);
+
+    /*
+     * Translate text from source to target language.
+     * Returns allocated string (caller must free).
+     */
     char *translator_translate(const char *text, const char *source, const char *target);
+
     void translator_free(void);
     int translator_is_ready(void);
 

@@ -27,8 +27,8 @@ static char args_doc[] = "";
 
 static int is_valid_option(const char *name, const char* option_list[]){
     for (int i = 0; option_list[i]; i++)
-        if (strncmp(option_list[i], name, 20) == 0) return 1;
-    return 0;
+        if (strncmp(option_list[i], name, 20) == 0) return i;
+    return -1;
 }
 
 static struct argp_option options[] = {
@@ -41,6 +41,7 @@ static struct argp_option options[] = {
     {"source",   's', "FILE", 0, "Path to input mp4 file to transcribe"},
     {"output",   'o', "FILE", 0, "Path to output SRT file"},
     {"translate",   't', "MODEL",  0, "Language to translate to"},
+    {"language",  'l', "LANG", 0, "Input audio language code (e.g., ja, en, fr). Skips auto-detection if set"},
     {0}
 };
 
@@ -145,6 +146,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'o':
             arguments->output = arg;
             break;
+        case 'l':
+            arguments->language = arg;
+            break;
 
         case ARGP_KEY_END:
             if(arguments->mode == MODE_UNSET){
@@ -192,18 +196,19 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
             }
 
             // validate model
-            if (!is_valid_option(arguments->model,VALID_MODELS)) {
+            int transcribe_index = is_valid_option(arguments->model, TRANSCRIBE_MODEL_NAMES);
+            if (transcribe_index < 0){
                 char msg[512] = "Unknown model '";
                 strncat(msg, arguments->model, sizeof(msg) - strlen(msg) - 1);
                 strncat(msg, "'. Valid models are:\n", sizeof(msg) - strlen(msg) - 1);
 
-                for (int i = 0; VALID_MODELS[i]; i++) {
+                for (int i = 0; TRANSCRIBE_MODEL_NAMES[i]; i++) {
                     if(i % 2 == 1){
                         strncat(msg, ", ", sizeof(msg) - strlen(msg) - 1);
                     }
-                    strncat(msg, VALID_MODELS[i], sizeof(msg) - strlen(msg) - 1);
+                    strncat(msg, TRANSCRIBE_MODEL_NAMES[i], sizeof(msg) - strlen(msg) - 1);
                     if (i > 0 && (i + 1) % 2 == 0) {
-                        if(VALID_MODELS[i+1]){
+                        if(TRANSCRIBE_MODEL_NAMES[i+1]){
                             strncat(msg, ",", sizeof(msg) - strlen(msg) - 1);
                         }
                         strncat(msg, "\n", sizeof(msg) - strlen(msg) - 1);
@@ -211,6 +216,22 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
                 }
 
                 argp_error(state, "%s", msg);
+            }
+            else{
+                arguments->model = TRANSCRIBE_MODEL_NAMES_FULL[transcribe_index];
+            }
+
+            // validate input language
+            int transcribe_language_index = is_valid_option(arguments->language, WHISPER_LANGUAGE_CODES);
+            if (arguments->language && transcribe_language_index < 0) {
+                fprintf(stderr, "Unknown transcribe language '%s'. Valid languages:\n", arguments->language);
+
+                // print in columns: code - name
+                for (int i = 0; WHISPER_LANGUAGE_CODES[i]; i++) {
+                    fprintf(stderr, "  %3s - %s\n", WHISPER_LANGUAGE_CODES[i], WHISPER_LANGUAGE_NAMES[i]);
+                }
+
+                exit(EXIT_FAILURE);
             }
 
             // ensure translate model directory exists
@@ -223,7 +244,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
 
             // validate translate language
             if (arguments->translate && !is_valid_option(arguments->translate, VALID_LANGUAGES)) {
-                fprintf(stderr, "Unknown language '%s'. Valid languages:\n", arguments->translate);
+                fprintf(stderr, "Unknown translate language '%s'. Valid languages:\n", arguments->translate);
 
                 // print in columns: code - name
                 for (int i = 0; VALID_LANGUAGES[i]; i++) {
@@ -260,6 +281,7 @@ arguments* parse_args(const int argc, char *argv[]) {
     arguments->output = NULL;
     arguments->config = NULL;
     arguments->translate = NULL;
+    arguments->language = NULL;
     arguments->mode = MODE_UNSET;
 
     if (argp_parse(&argp, argc, argv, 0, NULL, arguments) != 0)

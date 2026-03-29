@@ -22,6 +22,7 @@ typedef struct {
     const char *output;
     const char *config;   // explicit --config path (headless only)
     const char *translate;
+    const char *language; // input audio language (skip auto-detection if set)
 }arguments;
 
 /*

@@ -66,7 +66,7 @@ static void whisper_silent_log_cb(enum ggml_log_level level,
 }
 
 subtitle_list* transcribe(const char *model_path, const float *audio_data,
-               size_t audio_frames, const char *vad_path){
+               size_t audio_frames, const char *vad_path, const char *language){
     g_chunk_offset_cs = 0;
 
     // load model
@@ -120,6 +120,29 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     wparams.vad_params.min_silence_duration_ms = 200; // 200ms silence ends segment
     wparams.vad_params.max_speech_duration_s = 5.0f;  // max 5s per segment
     wparams.vad_params.speech_pad_ms = 300;           // 300ms padding around segments
+
+    // set language if provided by user, otherwise auto-detect
+    if (language) {
+        wparams.language = language;
+        printf("INPUT LANGUAGE: %s (user specified)\n", language);
+    } else {
+        // detect language from audio at 60 seconds (skip typical anime intro ~1.5 min)
+        int detect_offset_ms = 60000;
+        int detect_offset_samples = (int)(detect_offset_ms / 1000.0f * WHISPER_SAMPLE_RATE);
+        if ((size_t)detect_offset_samples < audio_frames) {
+            // whisper_lang_auto_detect requires mel data to be set first
+            if (whisper_pcm_to_mel(ctx, audio_data + detect_offset_samples, (int)(audio_frames - detect_offset_samples), 1) == 0) {
+                int lang_id = whisper_lang_auto_detect(ctx, 0, 8, NULL);
+                if (lang_id >= 0) {
+                    const char *lang_str = whisper_lang_str(lang_id);
+                    if (lang_str) {
+                        wparams.language = lang_str;
+                        printf("DETECTED LANGUAGE: %s (id=%d) at %dms\n", lang_str, lang_id, detect_offset_ms);
+                    }
+                }
+            }
+        }
+    }
 
     // perform inference
     printf("BEGIN TRANSCRIPT\n");

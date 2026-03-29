@@ -13,6 +13,70 @@
 #define HF_BASE_URL "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/"
 #define HF_RAW_URL  "https://huggingface.co/ggerganov/whisper.cpp/raw/main/"
 
+static const char* TRANSCRIBE_MODEL_NAMES[] = {
+    "tiny",
+    "tiny.en",
+    "base",
+    "base.en",
+    "small",
+    "small.en",
+    "medium",
+    "medium.en",
+    "large",
+    "turbo",
+    NULL
+};
+
+static const char* TRANSCRIBE_MODEL_NAMES_FULL[] = {
+    "ggml-tiny.bin",
+    "ggml-tiny.en.bin",
+    "ggml-base.bin",
+    "ggml-base.en.bin",
+    "ggml-small.bin",
+    "ggml-small.en.bin",
+    "ggml-medium.bin",
+    "ggml-medium.en.bin",
+    "ggml-large-v3.bin",
+    "ggml-large-v3-turbo.bin",
+    NULL
+};
+
+static const char *WHISPER_LANGUAGE_CODES[] = {
+    "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo",
+    "br", "bs", "ca", "cs", "cy", "da", "de", "el", "en", "es",
+    "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "ha", "haw",
+    "he", "hi", "hr", "ht", "hu", "hy", "id", "is", "it", "ja",
+    "jw", "ka", "kk", "km", "kn", "ko", "la", "lb", "ln", "lo",
+    "lt", "lv", "mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt",
+    "my", "ne", "nl", "nn", "no", "oc", "pa", "pl", "ps", "pt",
+    "ro", "ru", "sa", "sd", "si", "sk", "sl", "sn", "so", "sq",
+    "sr", "su", "sv", "sw", "ta", "te", "tg", "th", "tk", "tl",
+    "tr", "tt", "uk", "ur", "uz", "vi", "yi", "yo", "zh", "yue",
+    NULL
+};
+
+static const char *WHISPER_LANGUAGE_NAMES[] = {
+    "Afrikaans", "Amharic", "Arabic", "Assamese", "Azerbaijani", "Bashkir",
+    "Belarusian", "Bulgarian", "Bengali", "Tibetan", "Breton", "Bosnian",
+    "Catalan", "Czech", "Welsh", "Danish", "German", "Greek", "English",
+    "Spanish", "Estonian", "Basque", "Persian", "Finnish", "Faroese",
+    "French", "Galician", "Gujarati", "Hausa", "Hawaiian", "Hebrew",
+    "Hindi", "Croatian", "Haitian Creole", "Hungarian", "Armenian",
+    "Indonesian", "Icelandic", "Italian", "Japanese", "Javanese",
+    "Georgian", "Kazakh", "Khmer", "Kannada", "Korean", "Latin",
+    "Luxembourgish", "Lingala", "Lao", "Lithuanian", "Latvian",
+    "Malagasy", "Maori", "Macedonian", "Malayalam", "Mongolian",
+    "Marathi", "Malay", "Maltese", "Myanmar", "Nepali", "Dutch",
+    "Norwegian Nynorsk", "Norwegian", "Occitan", "Punjabi", "Polish",
+    "Pashto", "Portuguese", "Romanian", "Russian", "Sanskrit",
+    "Sindhi", "Sinhala", "Slovak", "Slovenian", "Shona", "Somali",
+    "Albanian", "Serbian", "Sundanese", "Swedish", "Swahili",
+    "Tamil", "Telugu", "Tajik", "Thai", "Turkmen", "Tagalog",
+    "Turkish", "Tatar", "Ukrainian", "Urdu", "Uzbek", "Vietnamese",
+    "Yiddish", "Yoruba", "Chinese", "Cantonese",
+    NULL
+};
+
 #define VAD_MODEL_NAME "ggml-silero-v6.2.0.bin"
 #define VAD_MODEL_URL  "https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v6.2.0.bin"
 
@@ -30,20 +94,7 @@
 #define TRANSLATE_CONFIG_URL  "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/config.json"
 
 
-static const char* VALID_MODELS[] = {
-    "ggml-tiny.bin",
-    "ggml-tiny.en.bin",
-    "ggml-base.bin",
-    "ggml-base.en.bin",
-    "ggml-small.bin",
-    "ggml-small.en.bin",
-    "ggml-medium.bin",
-    "ggml-medium.en.bin",
-    "ggml-large-v3.bin",
-    "ggml-large-v3-turbo.bin",
-    NULL
-};
-
+// NLLB TRANSLATION LANGUAGES ////////////////////////////////////////
 static const char *VALID_LANGUAGES[] = {
     "ace_Arab",
     "ace_Latn",

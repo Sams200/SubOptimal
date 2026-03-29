@@ -18,7 +18,7 @@ void write_subtitles_to_file(const char* output_path,const subtitle_list* list){
     fclose(file);
 }
 
-subtitle_list* perform_transcribe(const char* model,const char* source){
+subtitle_list* perform_transcribe(const char* model, const char* source, const char* language){
     // TRANSCRIBE /////////////////////////
     // ensure models are present
     char model_rel_path[PATH_MAX];
@@ -49,7 +49,7 @@ subtitle_list* perform_transcribe(const char* model,const char* source){
     }
 
     // transcribe audio
-    subtitle_list* list = transcribe(model_path, pcm_frames, frame_count, vad_path);
+    subtitle_list* list = transcribe(model_path, pcm_frames, frame_count, vad_path, language);
     if(!list){
         free(pcm_frames);
         exit(1);
@@ -62,7 +62,7 @@ subtitle_list* perform_transcribe(const char* model,const char* source){
 int main(int argc, char *argv[]){
     arguments* arguments = parse_args(argc, argv);
 
-    subtitle_list* list = perform_transcribe(arguments->model, arguments->source);
+    subtitle_list* list = perform_transcribe(arguments->model, arguments->source, arguments->language);
 
     if(arguments->translate){
         // TRANSLATE /////////////////////////

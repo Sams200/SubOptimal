@@ -52,18 +52,19 @@ git submodule update --init --recursive
 | `-m`, `--model`    | Whisper.cpp model to use |
 | `-c`, `--config`   | Path to YAML config file |
 | `-t`, `--translate` | Language to translate into |
+| `-l`, `--language` | Source input language |
 
 ### Available Models
 
 | Model | Size | Speed | Accuracy |
 |-------|------|-------|----------|
-| `ggml-tiny.bin` | 75 MB | Fastest | Basic |
-| `ggml-base.bin` | 142 MB | Fast | Good |
-| `ggml-small.bin` | 466 MB | Medium | Better |
-| `ggml-medium.bin` | 1.5 GB | Medium | High |
-| `ggml-large-v3-turbo.bin` | 1.5 GB | Large | Highest |
+| `tiny` | 75 MB | Fastest | Basic |
+| `base` | 142 MB | Fast | Good |
+| `small` | 466 MB | Medium | Better |
+| `medium` | 1.5 GB | Medium | High |
+| `turbo` | 1.5 GB | Large | Highest |
 
-English-only models (`.en.bin`) are more performant for English audio.
+English-only models (`.en`) are more performant for English audio.
 
 ## Configuration
 

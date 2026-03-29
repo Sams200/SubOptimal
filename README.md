@@ -1,12 +1,13 @@
 # SubOptimal
 
-A fast, lightweight application for generating subtitles using whisper.cpp. Translates subtitles using CTranslate2.
+A fast, lightweight application for generating subtitles using whisper.cpp. Local translation using CTranslate2.
 
 ## Features
 
 - **Fast transcription** - GPU-accelerated via CUDA
 - **Minimal footprint** - Statically linked whisper.cpp and ggml for portability
 - **SRT output** - Standard subtitle format ready for use
+- **Translation** - Local text translation using Helsinki-NLB and Facebook NLLB
 
 ## Requirements
 
@@ -52,7 +53,7 @@ git submodule update --init --recursive
 | `-m`, `--model`    | Whisper.cpp model to use |
 | `-c`, `--config`   | Path to YAML config file |
 | `-t`, `--translate` | Language to translate into |
-| `-l`, `--language` | Source input language |
+| `-l`, `--language` | Input source language |
 
 ### Available Models
 
@@ -85,7 +86,8 @@ Configuration lookup order:
 
 ## Architecture Notes
 
-- Audio is extracted from video using FFmpeg (piped directly)
+- Audio is extracted from video using FFmpeg
 - Models are downloaded automatically on first run
 - CUDA acceleration is enabled by default for GPU inference
 - Static linking ensures portability across systems
+- Translation uses Helsinki-NLB models when available

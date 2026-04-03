@@ -126,20 +126,40 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
         wparams.language = language;
         list->language = language;
     } else {
-        // detect language from audio at 60 seconds (skip typical anime intro ~1.5 min)
-        int detect_offset_ms = 60000;
-        int detect_offset_samples = (int)(detect_offset_ms / 1000.0f * WHISPER_SAMPLE_RATE);
-        if ((size_t)detect_offset_samples < audio_frames) {
-            // whisper_lang_auto_detect requires mel data to be set first
-            if (whisper_pcm_to_mel(ctx, audio_data + detect_offset_samples, (int)(audio_frames - detect_offset_samples), 1) == 0) {
-                int lang_id = whisper_lang_auto_detect(ctx, 0, 8, NULL);
-                if (lang_id >= 0) {
-                    const char *lang_str = whisper_lang_str(lang_id);
-                    if (lang_str) {
-                        wparams.language = lang_str;
-                        list->language = lang_str;
-                    }
+        // detect language at 3 points (25%, 50%, 75%) and take majority vote
+        float offsets[] = {0.25f, 0.50f, 0.75f};
+        int votes[3] = {-1, -1, -1};
+
+        for (int i = 0; i < 3; i++) {
+            int offset_samples = (int)(audio_frames * offsets[i]);
+            int remaining = (int)(audio_frames - offset_samples);
+            if (remaining > 0) {
+                if (whisper_pcm_to_mel(ctx, audio_data + offset_samples, remaining, 1) == 0) {
+                    votes[i] = whisper_lang_auto_detect(ctx, 0, 8, NULL);
                 }
+            }
+        }
+
+        // majority vote (pick the lang_id that appears at least twice)
+        int detected_lang = -1;
+        if (votes[0] >= 0 && (votes[0] == votes[1] || votes[0] == votes[2])) {
+            detected_lang = votes[0];
+        } else if (votes[1] >= 0 && votes[1] == votes[2]) {
+            detected_lang = votes[1];
+        } else if (votes[0] >= 0) {
+            detected_lang = votes[0]; // no majority, fall back to first valid
+        } else if (votes[1] >= 0) {
+            detected_lang = votes[1];
+        } else {
+            detected_lang = votes[2];
+        }
+
+        if (detected_lang >= 0) {
+            const char *lang_str = whisper_lang_str(detected_lang);
+            if (lang_str) {
+                printf("DETECTED LANGUAGE: %s\n", lang_str);
+                wparams.language = lang_str;
+                list->language = lang_str;
             }
         }
     }

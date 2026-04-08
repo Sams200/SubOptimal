@@ -46,7 +46,7 @@ static unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size
         execlp("ffmpeg", "ffmpeg",
             "-loglevel", "warning",
             "-i", video_path,
-            "-af", "highpass=f=150,lowpass=f=4500",
+            // "-af", "highpass=f=150,lowpass=f=4500",
             "-f", "wav",
             "-ar", "16000",
             "-ac", "1",

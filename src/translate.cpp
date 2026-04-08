@@ -23,52 +23,62 @@ void translator_init(const char *model_path, const char *spm_path) {
         throw std::runtime_error("Failed to load SentencePiece model");
 }
 
-char *translator_translate(const char *text, const char *source, const char *target) {
-    if (!translator || !spp) return nullptr;
-
-    // tokenize
-    std::vector<std::string> tokens;
-    spp->Encode(text, &tokens);
-
-    // NLLB expects target language token at start and source at end
-    tokens.push_back("</s>");
-    tokens.push_back(source);
-
-    ctranslate2::TranslationOptions opts;
-    opts.beam_size = 4;
-
-    std::vector<std::string> target_prefix = {target};
-
-    auto results = translator->translate_batch(
-        {tokens},
-        {target_prefix},
-        opts
-    );
-
-    const auto &output_tokens = results[0].output();
-
-    // detokenize, skipping the target language token at index 0
-    std::vector<std::string> decoded(output_tokens.begin() + 1, output_tokens.end());
-    std::string out;
-    spp->Decode(decoded, &out);
-
-    return strdup(out.c_str());
-}
-
 void translate_subtitles(subtitle_list* subtitles, const char *source, const char *target) {
     if (!subtitles || !subtitles->segments || subtitles->count == 0) return;
 
     printf("BEGIN TRANSLATION\n");
 
+    ctranslate2::TranslationOptions opts;
+    opts.beam_size = 2;
+
+    const size_t batch_size = 24;
+
+    // Encode all text to tokens upfront
+    std::vector<std::vector<std::string>> all_tokens;
+    std::vector<std::vector<std::string>> target_prefixes;
+
     for (size_t i = 0; i < subtitles->count; i++) {
-        subtitle_segment *seg = &subtitles->segments[i];
-        if (seg->text) {
-            char *translated = translator_translate(seg->text, source, target);
-            if (translated) {
-                free(seg->text);
-                seg->text = translated;
-                fprintf(stdout, "[%s --> %s] %s\n", seg->t0, seg->t1, seg->text);
-            }
+        std::string text = subtitles->segments[i].text ? subtitles->segments[i].text : "";
+        std::vector<std::string> tokens;
+        spp->Encode(text, &tokens);
+        tokens.push_back("</s>");
+        tokens.push_back(source);
+        all_tokens.push_back(tokens);
+        target_prefixes.push_back({target});
+    }
+
+    // Translate in batches
+    for (size_t offset = 0; offset < subtitles->count; offset += batch_size) {
+        size_t end = offset + batch_size;
+        if (end > subtitles->count)
+            end = subtitles->count;
+
+        std::vector<std::vector<std::string>> batch_tokens(
+            all_tokens.begin() + offset, all_tokens.begin() + end);
+        std::vector<std::vector<std::string>> batch_prefixes(
+            target_prefixes.begin() + offset, target_prefixes.begin() + end);
+
+        auto results = translator->translate_batch(batch_tokens, batch_prefixes, opts);
+
+        // Decode tokens to text
+        for (size_t j = 0; j < results.size(); j++) {
+            size_t idx = offset + j;
+            if (results[j].output().empty())
+                continue;
+
+            const auto &output_tokens = results[j].output();
+            std::vector<std::string> decoded(output_tokens.begin() + 1, output_tokens.end());
+            std::string out;
+            spp->Decode(decoded, &out);
+
+            if (subtitles->segments[idx].text)
+                free(subtitles->segments[idx].text);
+            subtitles->segments[idx].text = strdup(out.c_str());
+
+            fprintf(stdout, "[%s --> %s] %s\n",
+                    subtitles->segments[idx].t0,
+                    subtitles->segments[idx].t1,
+                    subtitles->segments[idx].text);
         }
     }
 }

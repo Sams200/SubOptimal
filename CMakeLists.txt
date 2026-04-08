@@ -41,6 +41,11 @@ add_executable(sub_optimal_app
     src/file_helpers.h
 src/translate.cpp
 src/translate.h
+src/post_processing.c
+src/post_processing.h
+src/subtitles.h
+
+
 )
 
 target_link_libraries(sub_optimal_app PRIVATE

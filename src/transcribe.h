@@ -5,19 +5,7 @@
 #ifndef TRANSCRIBE_H
 #define TRANSCRIBE_H
 #include <stddef.h>
-
-typedef struct {
-    char t0[32];
-    char t1[32];
-    char *text;
-} subtitle_segment;
-
-typedef struct {
-    subtitle_segment *segments;
-    size_t count;
-    size_t capacity;
-    char* language;
-} subtitle_list;
+#include "subtitles.h"
 
 /*
  * Transcribe audio data and return list of subtitle segments.

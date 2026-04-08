@@ -6,8 +6,10 @@
 #include "defaults.h"
 #include "parser.h"
 #include "loader.h"
+#include "subtitles.h"
 #include "transcribe.h"
 #include "file_helpers.h"
+#include "post_processing.h"
 #include "translate.h"
 
 void write_subtitles_to_file(const char* output_path,const subtitle_list* list){
@@ -119,18 +121,19 @@ int main(int argc, char *argv[]){
     arguments* arguments = parse_args(argc, argv);
 
     subtitle_list *list = perform_transcribe(arguments->model, arguments->source, arguments->language);
+
     if (arguments->translate) {
-        perform_translate(list, arguments->translate);
+        merged_list *merged = merge_sentences(list);
+        free_subtitle_list(list);
+
+        perform_translate(merged->subs, arguments->translate);
+
+        list = split_for_display(merged, 80);
+        free_merged_list(merged);
     }
 
-    write_subtitles_to_file(arguments->output,list);
-
-    // cleanup
-    for(int i=0;i<list->count;i++){
-        free(list->segments[i].text);
-    }
-    free(list->segments);
-    free(list);
+    write_subtitles_to_file(arguments->output, list);
+    free_subtitle_list(list);
     free(arguments);
     return 0;
 }

@@ -46,14 +46,15 @@ add_executable(suboptimal
     src/file_helpers.h
     src/translate.cpp
     src/translate.h
-    src/post_processing.c
-    src/post_processing.h
     src/subtitles.h
     src/context_check.c
     src/validator.c
     src/validator.h
     src/terminal_ui.c
     src/terminal_ui.h
+    src/subtitles.c
+    cjson/cJSON.c
+    cjson/cJSON.h
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -74,4 +75,5 @@ target_include_directories(suboptimal PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CURL_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/cjson
 )

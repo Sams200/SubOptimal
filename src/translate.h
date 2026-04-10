@@ -30,7 +30,6 @@ extern "C" {
     void translate_subtitles(subtitle_list* subtitles, const char *source, const char *target);
 
     void translator_free(void);
-    int translator_is_ready(void);
 
 #ifdef __cplusplus
 }

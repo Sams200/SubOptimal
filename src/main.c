@@ -9,7 +9,6 @@
 #include "subtitles.h"
 #include "transcribe.h"
 #include "file_helpers.h"
-#include "post_processing.h"
 #include "translate.h"
 #include "context_check.h"
 
@@ -127,12 +126,8 @@ int main(int argc, char *argv[]){
     subtitle_list* translated_list = NULL;
 
     if (arguments->translate) {
-        merged_list *merged = merge_sentences(original_list);
-
-        perform_translate(merged->subs, arguments->translate);
-
-        translated_list = split_for_display(merged, 80);
-        free_merged_list(merged);
+        translated_list = duplicate_list(original_list);
+        perform_translate(translated_list, arguments->translate);
     }
 
     if (arguments->ollama_model) {

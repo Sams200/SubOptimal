@@ -86,11 +86,12 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
 
     int lang_idx = 0;
     while(!is_end_of_array(VALID_LANGUAGES[lang_idx])){
-        if(strncmp(VALID_LANGUAGES[lang_idx], target, 10) == 0)
+        if(strncmp_safe(VALID_LANGUAGES[lang_idx], target, 10)){
+            subtitles->language = LANGUAGE_NAMES[lang_idx];
             break;
+        }
         lang_idx++;
     }
-    subtitles->language = LANGUAGE_NAMES[lang_idx];
 
     print_progress(100);
     printf("\n");
@@ -101,8 +102,4 @@ void translator_free(void) {
     delete spp;
     translator = nullptr;
     spp = nullptr;
-}
-
-int translator_is_ready(void) {
-    return (translator != nullptr && spp != nullptr) ? 1 : 0;
 }

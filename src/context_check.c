@@ -6,6 +6,7 @@
 #include <curl/curl.h>
 #include "validator.h"
 #include "defaults.h"
+#include "cJSON.h"
 
 #define MAX_PROMPT_LEN (1 << 18)  /* 256KB */
 
@@ -66,140 +67,6 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, void *us
     return total;
 }
 
-// json stuff
-static char *unescape_json_string(const char *input) {
-    if (!input) return strdup("");
-
-    size_t len = strlen(input);
-    char *output = malloc(len * 3 + 1);
-    if (!output) return strdup("");
-
-    size_t j = 0;
-    for (size_t i = 0; i < len; i++) {
-        if (input[i] == '\\' && i + 1 < len) {
-            switch (input[i + 1]) {
-            case 'n':  output[j++] = '\n'; i++; break;
-            case 't':  output[j++] = '\t'; i++; break;
-            case 'r':  output[j++] = '\r'; i++; break;
-            case '\\': output[j++] = '\\'; i++; break;
-            case '"':  output[j++] = '"';  i++; break;
-            case '/':  output[j++] = '/';  i++; break;
-            case 'u': {
-                if (i + 5 < len) {
-                    char hex[5];
-                    memcpy(hex, input + i + 2, 4);
-                    hex[4] = '\0';
-                    unsigned int val;
-                    if (sscanf(hex, "%x", &val) == 1) {
-                        if (val >= 0xD800 && val <= 0xDBFF && i + 11 < len
-                            && input[i + 6] == '\\' && input[i + 7] == 'u') {
-                            char hex2[5];
-                            memcpy(hex2, input + i + 8, 4);
-                            hex2[4] = '\0';
-                            unsigned int lo;
-                            if (sscanf(hex2, "%x", &lo) == 1
-                                && lo >= 0xDC00 && lo <= 0xDFFF) {
-                                unsigned int cp = 0x10000
-                                    + ((val - 0xD800) << 10)
-                                    + (lo - 0xDC00);
-                                output[j++] = 0xF0 | (cp >> 18);
-                                output[j++] = 0x80 | ((cp >> 12) & 0x3F);
-                                output[j++] = 0x80 | ((cp >> 6) & 0x3F);
-                                output[j++] = 0x80 | (cp & 0x3F);
-                                i += 11;
-                                break;
-                            }
-                        }
-                        if (val < 0x80) {
-                            output[j++] = (char)val;
-                        } else if (val < 0x800) {
-                            output[j++] = 0xC0 | (val >> 6);
-                            output[j++] = 0x80 | (val & 0x3F);
-                        } else {
-                            output[j++] = 0xE0 | (val >> 12);
-                            output[j++] = 0x80 | ((val >> 6) & 0x3F);
-                            output[j++] = 0x80 | (val & 0x3F);
-                        }
-                    }
-                    i += 5;
-                } else {
-                    output[j++] = input[i];
-                }
-                break;
-            }
-            default:
-                output[j++] = input[i];
-                break;
-            }
-        } else {
-            output[j++] = input[i];
-        }
-    }
-    output[j] = '\0';
-    return output;
-}
-
-static char *escape_json_string(const char *input) {
-    if (!input) return strdup("");
-
-    size_t len = strlen(input);
-    char *output = malloc(len * 6 + 1);
-    if (!output) return NULL;
-
-    size_t j = 0;
-    for (size_t i = 0; i < len; i++) {
-        unsigned char c = (unsigned char)input[i];
-        switch (c) {
-        case '"':  output[j++] = '\\'; output[j++] = '"';  break;
-        case '\\': output[j++] = '\\'; output[j++] = '\\'; break;
-        case '\n': output[j++] = '\\'; output[j++] = 'n';  break;
-        case '\r': output[j++] = '\\'; output[j++] = 'r';  break;
-        case '\t': output[j++] = '\\'; output[j++] = 't';  break;
-        case '\b': output[j++] = '\\'; output[j++] = 'b';  break;
-        case '\f': output[j++] = '\\'; output[j++] = 'f';  break;
-        default:
-            if (c < 0x20) {
-                j += sprintf(output + j, "\\u%04x", c);
-            } else {
-                output[j++] = c;
-            }
-            break;
-        }
-    }
-    output[j] = '\0';
-    return output;
-}
-
-static char *extract_response_field(const char *json) {
-    if (!json) return NULL;
-
-    const char *key = "\"response\":\"";
-    char *start = strstr(json, key);
-    if (!start) return NULL;
-    start += strlen(key);
-
-    char *end = start;
-    while (*end) {
-        if (*end == '\\') {
-            end += 2;
-            continue;
-        }
-        if (*end == '"') break;
-        end++;
-    }
-    if (*end != '"') return NULL;
-
-    size_t len = end - start;
-    char *raw = malloc(len + 1);
-    if (!raw) return NULL;
-    memcpy(raw, start, len);
-    raw[len] = '\0';
-
-    char *unescaped = unescape_json_string(raw);
-    free(raw);
-    return unescaped;
-}
-
 int context_check_init(const char *host) {
     curl = curl_easy_init();
     if (!curl) {
@@ -236,6 +103,16 @@ void context_check_subtitles(
     const char *src = original ? original->language : "unknown";
     const char *tgt = translated ? translated->language : src;
 
+    // get full language name
+    int lang_idx=0;
+    while(!is_end_of_array(WHISPER_LANGUAGE_CODES[lang_idx])) {
+        if(strncmp_safe(WHISPER_LANGUAGE_CODES[lang_idx],src,3)) {
+            src = WHISPER_LANGUAGE_NAMES[lang_idx]? WHISPER_LANGUAGE_NAMES[lang_idx]: src;
+            break;
+        }
+        lang_idx++;
+    }
+
     int batch_size = 40;
     int overlap = 4;
 
@@ -246,7 +123,7 @@ void context_check_subtitles(
         total = min;
     }
 
-    for (int start_idx = 0; start_idx < total; start_idx += (batch_size)) {
+    for (int start_idx=0; start_idx<total; start_idx+=batch_size) {
         int end_idx = start_idx + batch_size;
         if (end_idx > total) end_idx = total;
         if (start_idx >= end_idx) break;
@@ -257,7 +134,7 @@ void context_check_subtitles(
         // Display progress
         int batch_number = start_idx/batch_size + 1;
         int total_batch = total/batch_size + 1;
-        printf("\rBatch %d/%d: in progress",batch_number, total_batch);
+        printf("\rBatch %d/%d: in progress", batch_number, total_batch);
         fflush(stdout);
 
         // build prompt
@@ -267,7 +144,7 @@ void context_check_subtitles(
         int offset = snprintf(prompt, MAX_PROMPT_LEN, system_prompt, src, tgt);
         offset += snprintf(prompt + offset, MAX_PROMPT_LEN - offset, "\n\n");
 
-        for (int i = context_start; i < end_idx && offset < MAX_PROMPT_LEN - 1024; i++) {
+        for (int i=context_start; i<end_idx && offset<MAX_PROMPT_LEN-1024; i++) {
             subtitle_segment *seg = &active->segments[i];
             char *t0 = seg->t0;
             char *t1 = seg->t1;
@@ -289,31 +166,14 @@ void context_check_subtitles(
         }
 
         // build json
-        char *model_esc = escape_json_string(model);
-        char *prompt_esc = escape_json_string(prompt);
+        cJSON *req_json = cJSON_CreateObject();
+        cJSON_AddStringToObject(req_json, "model", model);
+        cJSON_AddStringToObject(req_json, "prompt", prompt);
+        cJSON_AddBoolToObject(req_json, "stream", 0);
+        cJSON_AddBoolToObject(req_json, "think", 0);
+        char *request = cJSON_PrintUnformatted(req_json);
+        cJSON_Delete(req_json);
         free(prompt);
-
-        if (!model_esc || !prompt_esc) {
-            free(model_esc);
-            free(prompt_esc);
-            fprintf(stderr, "context_check: Failed to escape JSON strings\n");
-            continue;
-        }
-
-        size_t req_len = strlen(model_esc) + strlen(prompt_esc) + 128;
-        char *request = malloc(req_len);
-        if (!request) {
-            free(model_esc);
-            free(prompt_esc);
-            continue;
-        }
-
-        snprintf(request, req_len,
-            "{\"model\":\"%s\",\"prompt\":\"%s\",\"stream\":false,\"think\":false}",
-            model_esc, prompt_esc);
-
-        free(model_esc);
-        free(prompt_esc);
 
         // build url
         size_t url_len = strlen(ollama_host) + 32;
@@ -349,8 +209,15 @@ void context_check_subtitles(
         }
 
         // parse res
-        char *srt_text = extract_response_field(resp.data);
+        cJSON *resp_json = cJSON_Parse(resp.data);
         free(resp.data);
+        char *srt_text = NULL;
+        if (resp_json) {
+            cJSON *resp_field = cJSON_GetObjectItemCaseSensitive(resp_json, "response");
+            if (cJSON_IsString(resp_field) && resp_field->valuestring)
+                srt_text = strdup(resp_field->valuestring);
+            cJSON_Delete(resp_json);
+        }
 
         if (!srt_text) {
             fprintf(stderr, "context_check: Failed to extract response from JSON\n");

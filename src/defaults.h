@@ -10,7 +10,7 @@
 
 #define CONFIG_DIR "/.local/share/SubOptimal/"
 
-// Custom array terminator (distinct from NULL)
+// Custom array terminator
 #define END_OF_ARRAY "__END_OF_ARRAY__"
 
 // Check if string is the array terminator

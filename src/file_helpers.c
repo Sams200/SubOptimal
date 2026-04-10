@@ -11,40 +11,27 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#include <curl/curl.h>
 
-static int download_with_curl(const char *url, const char *dest_path){
-    pid_t pid = fork();
+static int download_with_curl(const char *url, const char *dest_path)
+{
+    CURL *curl = curl_easy_init();
+    FILE *fp = fopen(dest_path, "wb");
 
-    if(pid < 0){
-        perror("download_with_curl: fork");
-        return -1;
-    }
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
-    if(pid == 0){
-        // curl here
-        execlp("curl", "curl",
-               "-L",           // follow redirects
-               "-f",           // fail on HTTP error status
-               "-#",           // progress bar
-               "-o", dest_path,
-               url,
-               (char *)NULL);
+    CURLcode res = curl_easy_perform(curl);
 
-        // should not reach here
-        perror("download_with_curl: execlp curl");
-        _exit(127);
-    }
+    fclose(fp);
+    curl_easy_cleanup(curl);
 
-    // parent
-    int status;
-    if (waitpid(pid, &status, 0) < 0) {
-        perror("download_with_curl: waitpid");
-        return -1;
-    }
-
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        fprintf(stderr, "curl exited with status %d\n", WEXITSTATUS(status));
+    if (res != CURLE_OK) {
+        fprintf(stderr, "download_with_curl: %s\n", curl_easy_strerror(res));
+        remove(dest_path); // cleanup partial file
         return -1;
     }
 

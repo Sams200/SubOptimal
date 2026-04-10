@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 typedef struct {
+    int id;
     char t0[32];
     char t1[32];
     char *text;
@@ -16,7 +17,7 @@ typedef struct {
     subtitle_segment *segments;
     size_t count;
     size_t capacity;
-    char* language;
+    const char *language;
 } subtitle_list;
 
 static inline void free_subtitle_list(subtitle_list *list) {

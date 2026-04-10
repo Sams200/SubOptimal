@@ -36,6 +36,9 @@ static struct argp_option options[] = {
     {"output",   'o', "FILE", 0, "Path to output SRT file"},
     {"translate",   't', "MODEL",  0, "Language to translate to"},
     {"language",  'l', "LANG", 0, "Input audio language code (e.g., ja, en, fr). Skips auto-detection if set"},
+    {"context-check",   'X', NULL, 0, "Enable AI context verification"},
+    {"ollama-model",  'Q', "MODEL", 0, "Ollama model to use for context checking"},
+    {"ollama-host",   'D', "URL", 0, "Ollama host URL"},
     {0}
 };
 
@@ -143,6 +146,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'l':
             arguments->language = arg;
             break;
+        case 'Q':
+            arguments->ollama_model = arg;
+            break;
+        case 'D':
+            arguments->ollama_host = arg;
+            break;
 
         case ARGP_KEY_END:
             if(arguments->mode == MODE_UNSET){
@@ -188,6 +197,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
                     "Missing required option --source "
                     "(provide it on the command line or set 'source' in config)");
             }
+
+            // default values
+            if (!arguments->ollama_host) arguments->ollama_host = "http://localhost:11434";
 
             // validate model
             int transcribe_index = is_valid_option(arguments->model, TRANSCRIBE_MODEL_NAMES);
@@ -286,6 +298,8 @@ arguments* parse_args(const int argc, char *argv[]) {
     arguments->config = NULL;
     arguments->translate = NULL;
     arguments->language = NULL;
+    arguments->ollama_model = NULL;
+    arguments->ollama_host = NULL;
     arguments->mode = MODE_UNSET;
 
     if (argp_parse(&argp, argc, argv, 0, NULL, arguments) != 0)
@@ -297,6 +311,8 @@ arguments* parse_args(const int argc, char *argv[]) {
         arguments->source = NULL;
         arguments->output = NULL;
         arguments->config = NULL;
+        arguments->ollama_model = NULL;
+        arguments->ollama_host = NULL;
     }
 
     return arguments;

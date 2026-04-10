@@ -43,6 +43,7 @@ static void push_subtitle(subtitle_list *list, int64_t t0, int64_t t1,
     seg->text = malloc(len + 1);
     memcpy(seg->text, text, len);
     seg->text[len] = '\0';
+    seg->id = list->count;
 }
 
 static void push_merged(merged_list *ml, const char *t0, const char *t1,
@@ -187,7 +188,7 @@ subtitle_list* split_for_display(merged_list *merged, size_t max_chars) {
     if (!merged) return NULL;
 
     subtitle_list *output = calloc(1, sizeof(subtitle_list));
-    output->language = merged->language;
+    output->language = merged->subs->language;
 
     for (size_t i = 0; i < merged->count; i++) {
         merged_segment *ms = &merged->segments[i];

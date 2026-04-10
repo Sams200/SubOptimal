@@ -11,13 +11,16 @@
 #include "file_helpers.h"
 #include "post_processing.h"
 #include "translate.h"
+#include "context_check.h"
 
 void write_subtitles_to_file(const char* output_path,const subtitle_list* list){
     FILE* file = fopen(output_path, "w");
     for(int i=0;i<list->count;i++){
+        // skip deleted segments
+        if(list->segments[i].text[0] == '*')
+            continue;
         fprintf(file, "%d\n%s --> %s\n%s\n\n",
                 i+1, list->segments[i].t0, list->segments[i].t1, list->segments[i].text);
-
     }
     fclose(file);
 }
@@ -120,20 +123,40 @@ void perform_translate(subtitle_list *list, const char *target_nllb) {
 int main(int argc, char *argv[]){
     arguments* arguments = parse_args(argc, argv);
 
-    subtitle_list *list = perform_transcribe(arguments->model, arguments->source, arguments->language);
+    subtitle_list *original_list = perform_transcribe(arguments->model, arguments->source, arguments->language);
+    subtitle_list* translated_list = NULL;
 
     if (arguments->translate) {
-        merged_list *merged = merge_sentences(list);
-        free_subtitle_list(list);
+        merged_list *merged = merge_sentences(original_list);
 
         perform_translate(merged->subs, arguments->translate);
 
-        list = split_for_display(merged, 80);
+        translated_list = split_for_display(merged, 80);
         free_merged_list(merged);
     }
 
-    write_subtitles_to_file(arguments->output, list);
-    free_subtitle_list(list);
+    if (arguments->ollama_model) {
+        context_check_init(arguments->ollama_host);
+
+        if (translated_list) {
+            context_check_subtitles(original_list, translated_list, arguments->ollama_model);
+        }
+        else {
+            context_check_subtitles(original_list, NULL, arguments->ollama_model);
+        }
+        
+        context_check_free();
+    }
+
+    if (translated_list) {
+        write_subtitles_to_file(arguments->output, translated_list);
+        free_subtitle_list(translated_list);
+    }
+    else {
+        write_subtitles_to_file(arguments->output, original_list);
+    }
+
+    free_subtitle_list(original_list);
     free(arguments);
     return 0;
 }

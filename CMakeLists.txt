@@ -28,6 +28,10 @@ add_subdirectory(ctranslate2)
 add_subdirectory(sentencepiece)
 set(SPM_ENABLE_SHARED OFF CACHE BOOL "" FORCE)
 
+# curl for Ollama API
+find_package(CURL REQUIRED)
+include_directories(${CURL_INCLUDE_DIR})
+
 add_executable(sub_optimal_app
     src/main.c
     src/loader.c
@@ -44,7 +48,9 @@ src/translate.h
 src/post_processing.c
 src/post_processing.h
 src/subtitles.h
-
+src/context_check.c
+src/validator.c
+src/validator.h
 
 )
 
@@ -52,6 +58,7 @@ target_link_libraries(sub_optimal_app PRIVATE
     whisper
     ctranslate2
     sentencepiece-static
+    ${CURL_LIBRARIES}
 )
 
 target_include_directories(sub_optimal_app PRIVATE
@@ -59,4 +66,5 @@ target_include_directories(sub_optimal_app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/ctranslate2/include
     ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CURL_INCLUDE_DIR}
 )

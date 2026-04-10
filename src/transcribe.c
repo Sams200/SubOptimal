@@ -14,7 +14,6 @@
 
 #define MAX_CHUNK_S 20.0f
 static int64_t g_chunk_offset_cs = 0;
-
 // Convert to SRT timestamp format (HH:MM:SS,mmm)
 static void format_srt_timestamp(int64_t centiseconds, char* buffer){
     int64_t total_ms = centiseconds * 10;
@@ -48,6 +47,7 @@ static void whisper_log_cb(struct whisper_context *ctx,
         int64_t t0 = whisper_full_get_segment_t0(ctx, i) + g_chunk_offset_cs;
         int64_t t1 = whisper_full_get_segment_t1(ctx, i) + g_chunk_offset_cs;
 
+        seg->id = list->count;
         format_srt_timestamp(t0, seg->t0);
         format_srt_timestamp(t1, seg->t1);
         seg->text = strdup(whisper_full_get_segment_text(ctx, i));

@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <cstdio>
 
+#include "defaults.h"
+
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;
 
@@ -81,6 +83,14 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
                     subtitles->segments[idx].text);
         }
     }
+
+    int lang_idx = 0;
+    while(!is_end_of_array(VALID_LANGUAGES[lang_idx])){
+        if(strncmp(VALID_LANGUAGES[lang_idx], target, 10) == 0)
+            break;
+        lang_idx++;
+    }
+    subtitles->language = LANGUAGE_NAMES[lang_idx];
 }
 
 void translator_free(void) {

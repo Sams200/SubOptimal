@@ -56,7 +56,7 @@ git submodule update --init --recursive
 | `-t`, `--translate` | Language to translate into |
 | `-l`, `--language` | (Optional) Input source language |
 | `-Q`, `--ollama-model` | Ollama model for enabling validation |
-| `-D`, `--ollama-host` | (Optional) URL for ollama server |
+| `-U`, `--ollama-host` | (Optional) URL for ollama server |
 
 ### Available Models
 

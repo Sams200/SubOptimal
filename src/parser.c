@@ -31,13 +31,13 @@ static struct argp_option options[] = {
     {"gui",      'G', NULL,      0, "Launch the GUI (ignores all other options)"},
     /* headless options */
     {"config",   'c', "FILE", 0, "Path to YAML config file (headless only)"},
-    {"model",    'm', "MODEL",0, "Whisper.cpp model name (e.g., ggml-base.en.bin)"},
-    {"source",   's', "FILE", 0, "Path to input mp4 file to transcribe"},
+    {"model",    'm', "MODEL",0, "Whisper.cpp model name (e.g., base.en)"},
+    {"source",   's', "FILE", 0, "Path to input video file"},
     {"output",   'o', "FILE", 0, "Path to output SRT file"},
-    {"translate",   't', "MODEL",  0, "Language to translate to"},
-    {"language",  'l', "LANG", 0, "Input audio language code (e.g., ja, en, fr). Skips auto-detection if set"},
-    {"ollama-model",  'Q', "MODEL", 0, "Ollama model to use for context checking"},
-    {"ollama-host",   'D', "URL", 0, "Ollama host URL"},
+    {"translate",   't', "MODEL",  0, "Target translate language"},
+    {"language",  'l', "LANG", 0, "Optional input audio language code (e.g., ja, en, fr). Skips auto-detection if set"},
+    {"ollama-model",  'Q', "MODEL", 0, "Ollama model to enable validation"},
+    {"ollama-host",   'U', "URL", 0, "Ollama host URL. Default \"http://localhost:11434\""},
     {0}
 };
 
@@ -148,7 +148,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'Q':
             arguments->ollama_model = arg;
             break;
-        case 'D':
+        case 'U':
             arguments->ollama_host = arg;
             break;
 

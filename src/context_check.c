@@ -96,7 +96,7 @@ void context_check_subtitles(
         return;
     }
 
-    printf("Validating subtitles...\n");
+    printf("Validating subtitles:\n");
     fflush(stdout);
 
     subtitle_list *active = translated ? translated : original;

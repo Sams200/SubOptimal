@@ -155,15 +155,29 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
         if (detected_lang >= 0) {
             const char *lang_str = whisper_lang_str(detected_lang);
             if (lang_str) {
-                printf("DETECTED LANGUAGE: %s\n", lang_str);
+                // get full language name
+                int lang_idx=0;
+                const char *lang_name;
+                while(!is_end_of_array(WHISPER_LANGUAGE_CODES[lang_idx])) {
+                    if(strncmp_safe(WHISPER_LANGUAGE_CODES[lang_idx],lang_str,3)) {
+                        lang_name = WHISPER_LANGUAGE_NAMES[lang_idx]? WHISPER_LANGUAGE_NAMES[lang_idx]: lang_str;
+                        break;
+                    }
+                    lang_idx++;
+                }
+
+                printf("Detected language: %s\n", lang_name);
                 wparams.language = lang_str;
                 list->language = lang_str;
             }
         }
+        else{
+            printf("Unknown language!\n");
+        }
     }
 
     // perform inference
-    printf("Transcribing audio...\n");
+    printf("Transcribing audio:\n");
 
     int n_samples_chunk = (int)(MAX_CHUNK_S * WHISPER_SAMPLE_RATE);
     int prev_progress=0;

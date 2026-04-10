@@ -29,7 +29,7 @@ void translator_init(const char *model_path, const char *spm_path) {
 void translate_subtitles(subtitle_list* subtitles, const char *source, const char *target) {
     if (!subtitles || !subtitles->segments || subtitles->count == 0) return;
 
-    printf("Translating subtitles...\n");
+    printf("Translating subtitles:\n");
 
     ctranslate2::TranslationOptions opts;
     opts.beam_size = 2;

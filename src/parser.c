@@ -36,7 +36,6 @@ static struct argp_option options[] = {
     {"output",   'o', "FILE", 0, "Path to output SRT file"},
     {"translate",   't', "MODEL",  0, "Language to translate to"},
     {"language",  'l', "LANG", 0, "Input audio language code (e.g., ja, en, fr). Skips auto-detection if set"},
-    {"context-check",   'X', NULL, 0, "Enable AI context verification"},
     {"ollama-model",  'Q', "MODEL", 0, "Ollama model to use for context checking"},
     {"ollama-host",   'D', "URL", 0, "Ollama host URL"},
     {0}

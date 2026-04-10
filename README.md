@@ -8,6 +8,7 @@ A fast, lightweight application for generating subtitles using whisper.cpp. Loca
 - **Minimal footprint** - Statically linked whisper.cpp and ggml for portability
 - **SRT output** - Standard subtitle format ready for use
 - **Translation** - Local text translation using Helsinki-NLB and Facebook NLLB
+- **Validation** - Subtitle validation through Ollama
 
 ## Requirements
 
@@ -26,8 +27,8 @@ cd SubOptimal
 
 # Build
 mkdir build && cd build
-cmake ..
-make -j$(nproc)
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . -j$(nproc)
 ```
 
 **Important:** Use `--recursive` when cloning to pull the whisper.cpp submodule. If you already cloned without it:
@@ -40,7 +41,7 @@ git submodule update --init --recursive
 ### Basic Usage
 
 ```bash
-./sub_optimal_app --headless -s input.mp4 -o output.srt -m ggml-base.en.bin
+./sub_optimal_app --headless -s input.mp4 -o output.srt -m base.en --translate eng_Latn -Q gemma4:31b-cloud
 ```
 
 ### Command-Line Options
@@ -53,7 +54,9 @@ git submodule update --init --recursive
 | `-m`, `--model`    | Whisper.cpp model to use |
 | `-c`, `--config`   | Path to YAML config file |
 | `-t`, `--translate` | Language to translate into |
-| `-l`, `--language` | Input source language |
+| `-l`, `--language` | (Optional) Input source language |
+| `-Q`, `--ollama-model` | Ollama model for enabling validation |
+| `-D`, `--ollama-host` | (Optional) URL for ollama server |
 
 ### Available Models
 
@@ -84,10 +87,14 @@ Configuration lookup order:
 1. `~/.local/share/SubOptimal/config.yaml` (or path from `--config`)
 2. Command-line flags (override config values)
 
+## Running validation through Ollama
+1. Run ```ollama serve``` or start the ollama service
+2. If using a cloud model, log into your account by running ```ollama login```, otherwise download a model using ```ollama pull <model>```
+3. Select an appropriate model from the [models list](https://ollama.com/search). Good models should focus on language processing and have reduced size.
+
 ## Architecture Notes
 
 - Audio is extracted from video using FFmpeg
-- Models are downloaded automatically on first run
+- Transcription and translation models are downloaded automatically on first run
 - CUDA acceleration is enabled by default for GPU inference
 - Static linking ensures portability across systems
-- Translation uses Helsinki-NLB models when available

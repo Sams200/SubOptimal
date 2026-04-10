@@ -51,6 +51,8 @@ src/subtitles.h
 src/context_check.c
 src/validator.c
 src/validator.h
+src/terminal_ui.c
+src/terminal_ui.h
 
 )
 

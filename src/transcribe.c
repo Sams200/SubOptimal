@@ -8,9 +8,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
 #include "defaults.h"
 #include <whisper.h>
+#include "terminal_ui.h"
+
 
 #define MAX_CHUNK_S 20.0f
 static int64_t g_chunk_offset_cs = 0;
@@ -51,9 +52,6 @@ static void whisper_log_cb(struct whisper_context *ctx,
         format_srt_timestamp(t0, seg->t0);
         format_srt_timestamp(t1, seg->t1);
         seg->text = strdup(whisper_full_get_segment_text(ctx, i));
-
-        fprintf(stdout, "[%s --> %s] %s\n", seg->t0, seg->t1, seg->text);
-
     }
 }
 
@@ -165,21 +163,30 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     }
 
     // perform inference
-    printf("BEGIN TRANSCRIPT\n");
+    printf("Transcribing audio...\n");
 
     int n_samples_chunk = (int)(MAX_CHUNK_S * WHISPER_SAMPLE_RATE);
+    int prev_progress=0;
 
     for (size_t offset = 0; offset < audio_frames; offset += n_samples_chunk) {
+        // Display progress bar
+        int curr_progress = offset*100/audio_frames;
+        if(curr_progress - prev_progress > 0){
+            print_progress(curr_progress);
+            fflush(stdout);
+        }
+
         size_t chunk_len = (offset + n_samples_chunk > audio_frames)
                         ? (audio_frames - offset)
                         : n_samples_chunk;
-
         whisper_full(ctx, wparams, audio_data + offset, (int)chunk_len);
 
         // advance offset by how many samples got processed
         g_chunk_offset_cs = (int64_t)((offset + chunk_len) / (float)WHISPER_SAMPLE_RATE * 100);
     }
 
+    print_progress(100);
+    printf("\n");
     whisper_free(ctx);
     return list;
 }

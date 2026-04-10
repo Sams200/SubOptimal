@@ -229,6 +229,9 @@ void context_check_subtitles(
         return;
     }
 
+    printf("Validating subtitles...\n");
+    fflush(stdout);
+
     subtitle_list *active = translated ? translated : original;
     const char *src = original ? original->language : "unknown";
     const char *tgt = translated ? translated->language : src;
@@ -250,6 +253,12 @@ void context_check_subtitles(
 
         int context_start = start_idx - overlap;
         if (context_start < 0) context_start = 0;
+
+        // Display progress
+        int batch_number = start_idx/batch_size + 1;
+        int total_batch = total/batch_size + 1;
+        printf("\rBatch %d/%d: in progress",batch_number, total_batch);
+        fflush(stdout);
 
         // build prompt
         char *prompt = malloc(MAX_PROMPT_LEN);
@@ -277,8 +286,6 @@ void context_check_subtitles(
                 "  Original text: %s\n"
                 "  Translation: %s\n\n",
                 i + 1, t0, t1, orig_text, trans_text);
-
-            printf("%d %s\n", i+1, trans_text);
         }
 
         // build json
@@ -375,9 +382,6 @@ void context_check_subtitles(
             }
 
             if (!match) {
-                fprintf(stderr, "context_check: No match for segment %d "
-                        "(%s --> %s), keeping original\n",
-                        i + 1, seg->t0, seg->t1);
                 continue;
             }
 
@@ -387,8 +391,9 @@ void context_check_subtitles(
             applied++;
         }
 
-        fprintf(stderr, "context_check: Batch %d-%d: applied %d/%zu corrections\n",
-                start_idx + 1, end_idx, applied, parsed->count);
+        printf("\rBatch %d/%d: applied %d/%zu corrections\n",
+            batch_number, total_batch, applied, parsed->count);
+        fflush(stdout);
 
         free_subtitle_list(parsed);
     }

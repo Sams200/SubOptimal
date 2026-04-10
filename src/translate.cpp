@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include "defaults.h"
+#include "terminal_ui.h"
 
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;
@@ -28,7 +29,7 @@ void translator_init(const char *model_path, const char *spm_path) {
 void translate_subtitles(subtitle_list* subtitles, const char *source, const char *target) {
     if (!subtitles || !subtitles->segments || subtitles->count == 0) return;
 
-    printf("BEGIN TRANSLATION\n");
+    printf("Translating subtitles...\n");
 
     ctranslate2::TranslationOptions opts;
     opts.beam_size = 2;
@@ -51,6 +52,10 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
 
     // Translate in batches
     for (size_t offset = 0; offset < subtitles->count; offset += batch_size) {
+        // Display progress bar
+        int progress = offset * 100 / subtitles->count;
+        print_progress(progress);
+
         size_t end = offset + batch_size;
         if (end > subtitles->count)
             end = subtitles->count;
@@ -76,11 +81,6 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
             if (subtitles->segments[idx].text)
                 free(subtitles->segments[idx].text);
             subtitles->segments[idx].text = strdup(out.c_str());
-
-            fprintf(stdout, "[%s --> %s] %s\n",
-                    subtitles->segments[idx].t0,
-                    subtitles->segments[idx].t1,
-                    subtitles->segments[idx].text);
         }
     }
 
@@ -91,6 +91,9 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
         lang_idx++;
     }
     subtitles->language = LANGUAGE_NAMES[lang_idx];
+
+    print_progress(100);
+    printf("\n");
 }
 
 void translator_free(void) {

@@ -158,8 +158,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state){
             }
 
             if(arguments->mode == MODE_GUI){
-                printf("GUI not implemented yet. Run with --headless\n");
-                exit(1);
+                break;
             }
 
             char default_cfg[4096] = {0};
@@ -303,16 +302,6 @@ arguments* parse_args(const int argc, char *argv[]) {
 
     if (argp_parse(&argp, argc, argv, 0, NULL, arguments) != 0)
         exit(EXIT_FAILURE);
-
-    // discard this stuff in gui mode
-    if (arguments->mode == MODE_GUI) {
-        arguments->model  = NULL;
-        arguments->source = NULL;
-        arguments->output = NULL;
-        arguments->config = NULL;
-        arguments->ollama_model = NULL;
-        arguments->ollama_host = NULL;
-    }
 
     return arguments;
 }

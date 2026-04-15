@@ -6,11 +6,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include "defaults.h"
 #include <whisper.h>
-#include "terminal_ui.h"
+#include "cli_ui.h"
 
 
 #define MAX_CHUNK_S 20.0f
@@ -68,12 +67,18 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     g_chunk_offset_cs = 0;
 
     // load model
+    printf("Loading model from: %s\n", model_path);
+    fflush(stdout);
+
     whisper_log_set(whisper_silent_log_cb, NULL);
     struct whisper_context* ctx = whisper_init_from_file(model_path);
     if(ctx == NULL){
         fprintf(stderr, "transcribe: Failed to load model %s\n", model_path);
         return NULL;
     }
+
+    printf("Successfully loaded model\n");
+    fflush(stdout);
 
     subtitle_list *list = malloc(sizeof(subtitle_list));
     if(list == NULL){
@@ -125,6 +130,9 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
         list->language = language;
     } else {
         // detect language at 3 points (25%, 50%, 75%) and take majority vote
+        printf("Detecting audio language...\n");
+        fflush(stdout);
+
         float offsets[] = {0.25f, 0.50f, 0.75f};
         int votes[3] = {-1, -1, -1};
 
@@ -178,6 +186,7 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
 
     // perform inference
     printf("Transcribing audio:\n");
+    fflush(stdout);
 
     int n_samples_chunk = (int)(MAX_CHUNK_S * WHISPER_SAMPLE_RATE);
     int prev_progress=0;

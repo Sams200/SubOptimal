@@ -2,7 +2,7 @@
 // Created by sams on 4/11/26.
 //
 
-#include "terminal_ui.h"
+#include "cli_ui.h"
 #include <stdio.h>
 
 void print_progress(int percent) {

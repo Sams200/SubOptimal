@@ -93,6 +93,9 @@ static unsigned char* load_audio_via_ffmpeg(const char* video_path, size_t* size
 }
 
 float* load_audio(const char* source, size_t* frame_count_out){
+    printf("Loading audio from: %s\n", source);
+    fflush(stdout);
+
     size_t wav_size;
     unsigned char* wav_data = load_audio_via_ffmpeg(source, &wav_size);
 
@@ -129,5 +132,7 @@ float* load_audio(const char* source, size_t* frame_count_out){
     drwav_uninit(&wav);
     free(wav_data);
 
+    printf("Successfully loaded audio\n");
+    fflush(stdout);
     return pcm_frames;
 }

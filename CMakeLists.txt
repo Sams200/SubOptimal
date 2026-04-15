@@ -35,6 +35,8 @@ endif()
 
 add_executable(suboptimal
     src/main.c
+    src/cli.c
+    src/cli.h
     src/loader.c
     src/loader.h
     src/parser.c
@@ -50,8 +52,8 @@ add_executable(suboptimal
     src/context_check.c
     src/validator.c
     src/validator.h
-    src/terminal_ui.c
-    src/terminal_ui.h
+    src/cli_ui.c
+    src/cli_ui.h
     src/subtitles.c
     cjson/cJSON.c
     cjson/cJSON.h

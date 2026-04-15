@@ -8,7 +8,7 @@
 #include <cstdio>
 
 #include "defaults.h"
-#include "terminal_ui.h"
+#include "cli_ui.h"
 
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;

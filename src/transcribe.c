@@ -21,6 +21,9 @@ static atomic_int transcribe_progress_percent = 0;
 int get_transcribe_progress_percent(){
     return atomic_load(&transcribe_progress_percent);
 }
+void set_transcribe_progress_percent(int percent){
+    atomic_store(&transcribe_progress_percent, percent);
+}
 
 // Convert to SRT timestamp format (HH:MM:SS,mmm)
 static void format_srt_timestamp(int64_t centiseconds, char* buffer){

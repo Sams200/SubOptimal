@@ -20,6 +20,10 @@ static std::atomic<int> translate_progress_percent{0};
 int get_translate_progress_percent(){
     return translate_progress_percent.load();
 }
+void set_translate_progress_percent(int progress_percent){
+    translate_progress_percent.store(progress_percent);
+}
+
 
 void translator_init(const char *model_path, const char *spm_path) {
     translate_progress_percent.store(0);

@@ -52,6 +52,9 @@ static atomic_int context_progress_percent = 0;
 int get_context_progress_percent(){
     return atomic_load(&context_progress_percent);
 }
+void set_context_progress_percent(int percent){
+    atomic_store(&context_progress_percent, percent);
+}
 
 // curl stuff
 typedef struct {

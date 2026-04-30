@@ -15,6 +15,7 @@ void context_check_subtitles(
 void context_check_free(void);
 
 int get_context_progress_percent();
+void set_context_progress_percent(int progress_percent);
 
 #ifdef __cplusplus
 }

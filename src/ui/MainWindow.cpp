@@ -1,5 +1,4 @@
 #include "MainWindow.h"
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -93,19 +92,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Progress bars
     auto *progressGroup = new QGroupBox("Progress", this);
-    auto *progressLayout = new QVBoxLayout(progressGroup);
+    auto *progressForm = new QFormLayout(progressGroup);
+    progressForm->setLabelAlignment(Qt::AlignRight);
+
     m_transcribeProgress = new QProgressBar(this);
     m_transcribeProgress->setRange(0, 100);
     m_transcribeProgress->setValue(0);
+    progressForm->addRow("Transcribe:", m_transcribeProgress);
+
     m_translateProgress = new QProgressBar(this);
     m_translateProgress->setRange(0, 100);
     m_translateProgress->setValue(0);
+    progressForm->addRow("Translate:", m_translateProgress);
+
     m_contextProgress = new QProgressBar(this);
     m_contextProgress->setRange(0, 100);
     m_contextProgress->setValue(0);
-    progressLayout->addWidget(m_transcribeProgress);
-    progressLayout->addWidget(m_translateProgress);
-    progressLayout->addWidget(m_contextProgress);
+    progressForm->addRow("Validate:", m_contextProgress);
     mainLayout->addWidget(progressGroup);
 
     // Buttons
@@ -257,8 +260,13 @@ void MainWindow::updateProgress() {
 }
 
 void MainWindow::resetState() {
+    set_transcribe_progress_percent(0);
     m_transcribeProgress->setValue(0);
+
+    set_translate_progress_percent(0);
     m_translateProgress->setValue(0);
+
+    set_context_progress_percent(0);
     m_contextProgress->setValue(0);
     cancel_reset();
 }

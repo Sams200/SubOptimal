@@ -6,6 +6,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <cstdio>
+#include <atomic>
 
 #include "defaults.h"
 #include "cli_ui.h"
@@ -13,7 +14,14 @@
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;
 
+static std::atomic<int> translate_progress_percent{0};
+
+int get_translate_progress_percent(){
+    return translate_progress_percent.load();
+}
+
 void translator_init(const char *model_path, const char *spm_path) {
+    translate_progress_percent.store(0);
     translator = new ctranslate2::Translator(
         model_path,
         ctranslate2::Device::CUDA,
@@ -54,6 +62,7 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
     for (size_t offset = 0; offset < subtitles->count; offset += batch_size) {
         // Display progress bar
         int progress = offset * 100 / subtitles->count;
+        translate_progress_percent.store(progress);
         print_progress(progress);
 
         size_t end = offset + batch_size;
@@ -93,6 +102,7 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
         lang_idx++;
     }
 
+    translate_progress_percent.store(100);
     print_progress(100);
     printf("\n");
 }

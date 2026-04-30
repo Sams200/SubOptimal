@@ -20,4 +20,6 @@
  */
 subtitle_list* transcribe(const char *model_path, const float *audio_data,
                size_t audio_frames, const char *vad_path, const char *language);
+
+int get_transcribe_progress_percent();
 #endif //TRANSCRIBE_H

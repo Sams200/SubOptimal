@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdatomic.h>
 #include <curl/curl.h>
 #include "validator.h"
 #include "defaults.h"
@@ -45,6 +46,11 @@ static const char *system_prompt =
     "- Ensure output is in the target language\n"
     "- Separate each subtitle block with a blank line\n\n"
     "Return ONLY the corrected SRT blocks, no explanations.\n";
+
+static atomic_int context_progress_percent = 0;
+int get_context_progress_percent(){
+    return atomic_load(&context_progress_percent);
+}
 
 // curl stuff
 typedef struct {
@@ -90,6 +96,8 @@ void context_check_subtitles(
     subtitle_list *translated,
     const char *model)
 {
+    atomic_store(&context_progress_percent, 0);
+
     if (!original && !translated) return;
     if (!curl || !ollama_host) {
         fprintf(stderr, "context_check: Not initialized\n");
@@ -261,9 +269,11 @@ void context_check_subtitles(
         printf("\rBatch %d/%d: applied %d/%zu corrections\n",
             batch_number, total_batch, applied, parsed->count);
         fflush(stdout);
+        atomic_store(&context_progress_percent, (batch_number)*100/total_batch);
 
         free_subtitle_list(parsed);
     }
+    atomic_store(&context_progress_percent, 100);
 }
 
 void context_check_free(void) {

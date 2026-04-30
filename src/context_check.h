@@ -10,4 +10,6 @@ void context_check_subtitles(
     const char *model);
 void context_check_free(void);
 
+int get_context_progress_percent();
+
 #endif

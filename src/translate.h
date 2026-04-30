@@ -31,6 +31,8 @@ extern "C" {
 
     void translator_free(void);
 
+    int get_translate_progress_percent();
+
 #ifdef __cplusplus
 }
 #endif

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdatomic.h>
 #include "defaults.h"
 #include <whisper.h>
 #include "cli_ui.h"
@@ -14,6 +15,12 @@
 
 #define MAX_CHUNK_S 20.0f
 static int64_t g_chunk_offset_cs = 0;
+static atomic_int transcribe_progress_percent = 0;
+
+int get_transcribe_progress_percent(){
+    return atomic_load(&transcribe_progress_percent);
+}
+
 // Convert to SRT timestamp format (HH:MM:SS,mmm)
 static void format_srt_timestamp(int64_t centiseconds, char* buffer){
     int64_t total_ms = centiseconds * 10;
@@ -65,6 +72,7 @@ static void whisper_silent_log_cb(enum ggml_log_level level,
 subtitle_list* transcribe(const char *model_path, const float *audio_data,
                size_t audio_frames, const char *vad_path, const char *language){
     g_chunk_offset_cs = 0;
+    atomic_store(&transcribe_progress_percent, 0);
 
     // load model
     printf("Loading model from: %s\n", model_path);
@@ -194,6 +202,7 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     for (size_t offset = 0; offset < audio_frames; offset += n_samples_chunk) {
         // Display progress bar
         int curr_progress = offset*100/audio_frames;
+        atomic_store(&transcribe_progress_percent, curr_progress);
         if(curr_progress - prev_progress > 0){
             print_progress(curr_progress);
             fflush(stdout);
@@ -208,6 +217,7 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
         g_chunk_offset_cs = (int64_t)((offset + chunk_len) / (float)WHISPER_SAMPLE_RATE * 100);
     }
 
+    atomic_store(&transcribe_progress_percent, 100);
     print_progress(100);
     printf("\n");
     whisper_free(ctx);

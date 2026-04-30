@@ -38,7 +38,21 @@ MainWindow::MainWindow(QWidget *parent)
         m_modelCombo->addItem(TRANSCRIBE_MODEL_NAMES[i], i);
     }
     m_modelCombo->setCurrentIndex(3); // base.en
-    formLayout->addRow("Model:", m_modelCombo);
+
+    // Source language dropdown
+    m_sourceLanguageCombo = new QComboBox(this);
+    m_sourceLanguageCombo->addItem("Auto-detect", QString(""));
+    for (int i = 0; !is_end_of_array(WHISPER_LANGUAGE_CODES[i]); i++) {
+        if (WHISPER_LANGUAGE_CODES[i] != nullptr) {
+            m_sourceLanguageCombo->addItem(WHISPER_LANGUAGE_NAMES[i], QString(WHISPER_LANGUAGE_CODES[i]));
+        }
+    }
+    m_sourceLanguageCombo->setCurrentIndex(0); // Auto-detect
+
+    auto *modelLayout = new QHBoxLayout();
+    modelLayout->addWidget(m_modelCombo, 1);
+    modelLayout->addWidget(m_sourceLanguageCombo, 1);
+    formLayout->addRow("Model / Source Language:", modelLayout);
 
     // Translation
     m_translateCheck = new QCheckBox("Enable Translation", this);
@@ -56,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Context check
     m_contextCheck = new QCheckBox("Enable Context Check", this);
     m_ollamaModelEdit = new QLineEdit(this);
-    m_ollamaModelEdit->setPlaceholderText("mistral");
+    m_ollamaModelEdit->setPlaceholderText("gemma4:31b-cloud");
     m_ollamaModelEdit->hide();
     auto *ctxLayout = new QHBoxLayout();
     ctxLayout->addWidget(m_contextCheck);
@@ -146,6 +160,7 @@ void MainWindow::setControlsEnabled(bool enabled) {
     m_inputEdit->setEnabled(enabled);
     m_inputBtn->setEnabled(enabled);
     m_modelCombo->setEnabled(enabled);
+    m_sourceLanguageCombo->setEnabled(enabled);
     m_translateCheck->setEnabled(enabled);
     m_languageCombo->setEnabled(enabled);
     m_contextCheck->setEnabled(enabled);
@@ -167,12 +182,14 @@ void MainWindow::startPipeline() {
     int modelIndex = m_modelCombo->currentData().toInt();
     const char *modelFull = TRANSCRIBE_MODEL_NAMES_FULL[modelIndex];
 
+    QString sourceLanguage = m_sourceLanguageCombo->currentData().toString();
+
     bool translate = m_translateCheck->isChecked();
     QString targetLang = translate ? m_languageCombo->currentData().toString() : QString();
 
     bool contextCheck = m_contextCheck->isChecked();
     QString ollamaModel = contextCheck ? m_ollamaModelEdit->text().trimmed() : QString();
-    if (contextCheck && ollamaModel.isEmpty()) ollamaModel = "mistral";
+    if (contextCheck && ollamaModel.isEmpty()) ollamaModel = "gemma4:31b-cloud";
     QString ollamaHost = m_ollamaHostEdit->text().trimmed();
 
     resetState();
@@ -181,7 +198,7 @@ void MainWindow::startPipeline() {
     m_cancelBtn->setEnabled(true);
 
     m_thread = new QThread(this);
-    m_worker = new PipelineWorker(inputPath, outputPath, QString(modelFull),
+    m_worker = new PipelineWorker(inputPath, outputPath, QString(modelFull), sourceLanguage,
                                   translate, targetLang, contextCheck, ollamaModel,
                                   ollamaHost);
     m_worker->moveToThread(m_thread);

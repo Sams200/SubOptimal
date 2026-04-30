@@ -11,6 +11,7 @@ PipelineWorker::PipelineWorker(
     const QString &inputPath,
     const QString &outputPath,
     const QString &model,
+    const QString &sourceLanguage,
     bool translate,
     const QString &targetLang,
     bool contextCheck,
@@ -21,6 +22,7 @@ PipelineWorker::PipelineWorker(
     , m_inputPath(inputPath)
     , m_outputPath(outputPath)
     , m_model(model)
+    , m_sourceLanguage(sourceLanguage)
     , m_translate(translate)
     , m_targetLang(targetLang)
     , m_contextCheck(contextCheck)
@@ -35,11 +37,13 @@ void PipelineWorker::process() {
     std::string input = m_inputPath.toStdString();
     std::string output = m_outputPath.toStdString();
     std::string model = m_model.toStdString();
+    std::string sourceLanguage = m_sourceLanguage.toStdString();
     std::string targetLang = m_targetLang.toStdString();
     std::string ollamaModel = m_ollamaModel.toStdString();
     std::string ollamaHost = m_ollamaHost.toStdString();
 
-    subtitle_list *original = perform_transcribe(model.c_str(), input.c_str(), nullptr, &error);
+    const char *language = sourceLanguage.empty() ? nullptr : sourceLanguage.c_str();
+    subtitle_list *original = perform_transcribe(model.c_str(), input.c_str(), language, &error);
 
     if (is_cancelled()) {
         if (original) free_subtitle_list(original);

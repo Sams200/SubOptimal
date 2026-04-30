@@ -34,6 +34,7 @@ private:
     QPushButton *m_inputBtn;
 
     QComboBox *m_modelCombo;
+    QComboBox *m_sourceLanguageCombo;
 
     QCheckBox *m_translateCheck;
     QComboBox *m_languageCombo;

@@ -11,6 +11,7 @@ public:
         const QString &inputPath,
         const QString &outputPath,
         const QString &model,
+        const QString &sourceLanguage,
         bool translate,
         const QString &targetLang,
         bool contextCheck,
@@ -30,6 +31,7 @@ private:
     QString m_inputPath;
     QString m_outputPath;
     QString m_model;
+    QString m_sourceLanguage;
     bool m_translate;
     QString m_targetLang;
     bool m_contextCheck;

@@ -1,7 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(SubOptimal C CXX)
 
 set(CMAKE_C_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Check for Qt6 and enable GUI if available
+find_package(Qt6 COMPONENTS Widgets QUIET)
+if(Qt6_FOUND)
+    set(WITH_GUI ON)
+else()
+    set(WITH_GUI OFF)
+    message(WARNING "Qt6 not found. Building without GUI.")
+endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
@@ -55,9 +67,22 @@ add_executable(suboptimal
     src/cli_ui.c
     src/cli_ui.h
     src/subtitles.c
+    src/cancel.c
+    src/cancel.h
     cjson/cJSON.c
     cjson/cJSON.h
 )
+
+if(WITH_GUI)
+    target_sources(suboptimal PRIVATE
+        src/ui/gui.cpp
+        src/ui/gui.h
+        src/ui/MainWindow.cpp
+        src/ui/MainWindow.h
+        src/ui/PipelineWorker.cpp
+        src/ui/PipelineWorker.h
+    )
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_custom_command(TARGET suboptimal POST_BUILD
@@ -71,6 +96,11 @@ target_link_libraries(suboptimal PRIVATE
     ${CURL_LIBRARIES}
 )
 
+if(WITH_GUI)
+    target_link_libraries(suboptimal PRIVATE Qt6::Widgets)
+    target_compile_definitions(suboptimal PRIVATE WITH_GUI)
+endif()
+
 target_include_directories(suboptimal PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/whisper.cpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/ctranslate2/include
@@ -79,3 +109,9 @@ target_include_directories(suboptimal PRIVATE
     ${CURL_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/cjson
 )
+
+if(WITH_GUI)
+    target_include_directories(suboptimal PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
+    )
+endif()

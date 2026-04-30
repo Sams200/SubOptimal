@@ -4,6 +4,11 @@
 
 #ifndef SUBTITLES_H
 #define SUBTITLES_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,5 +28,9 @@ typedef struct {
 
 subtitle_list* duplicate_list(subtitle_list* list);
 void free_subtitle_list(subtitle_list *list);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //SUBTITLES_H

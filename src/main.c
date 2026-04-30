@@ -4,6 +4,10 @@
 #include "parser.h"
 #include "cli.h"
 
+#ifdef WITH_GUI
+#include "gui.h"
+#endif
+
 int main(int argc, char *argv[]) {
     arguments *args = parse_args(argc, argv);
 
@@ -13,8 +17,12 @@ int main(int argc, char *argv[]) {
         return ret;
     }
 
-    // MODE_GUI or MODE_UNSET
-    printf("GUI not implemented yet. Run with --headless\n");
+    // MODE_GUI or MODE_UNSET - discard other args, launch GUI
     free(args);
+#ifdef WITH_GUI
+    return run_gui(argc, argv);
+#else
+    fprintf(stderr, "GUI mode not available (Qt6 not found). Use --headless.\n");
     return 1;
+#endif
 }

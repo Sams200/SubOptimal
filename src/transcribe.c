@@ -11,6 +11,7 @@
 #include "defaults.h"
 #include <whisper.h>
 #include "cli_ui.h"
+#include "cancel.h"
 
 
 #define MAX_CHUNK_S 20.0f
@@ -200,6 +201,13 @@ subtitle_list* transcribe(const char *model_path, const float *audio_data,
     int prev_progress=0;
 
     for (size_t offset = 0; offset < audio_frames; offset += n_samples_chunk) {
+        if (is_cancelled()) {
+            fprintf(stderr, "Transcription cancelled by user\n");
+            whisper_free(ctx);
+            free_subtitle_list(list);
+            return NULL;
+        }
+
         // Display progress bar
         int curr_progress = offset*100/audio_frames;
         atomic_store(&transcribe_progress_percent, curr_progress);

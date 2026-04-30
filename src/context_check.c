@@ -8,6 +8,7 @@
 #include "validator.h"
 #include "defaults.h"
 #include "cJSON.h"
+#include "cancel.h"
 
 #define MAX_PROMPT_LEN (1 << 18)  /* 256KB */
 
@@ -132,6 +133,12 @@ void context_check_subtitles(
     }
 
     for (int start_idx=0; start_idx<total; start_idx+=batch_size) {
+        if (is_cancelled()) {
+            fprintf(stderr, "Context check cancelled by user\n");
+            atomic_store(&context_progress_percent, 0);
+            return;
+        }
+
         int end_idx = start_idx + batch_size;
         if (end_idx > total) end_idx = total;
         if (start_idx >= end_idx) break;
@@ -267,7 +274,7 @@ void context_check_subtitles(
         }
 
         printf("\rBatch %d/%d: applied %d/%zu corrections\n",
-            batch_number, total_batch, applied, parsed->count);
+            batch_number, total_batch, applied, start_idx==0 ? parsed->count : parsed->count-overlap);
         fflush(stdout);
         atomic_store(&context_progress_percent, (batch_number)*100/total_batch);
 

@@ -1,4 +1,5 @@
 #include "translate.h"
+#include <atomic>
 #include <ctranslate2/translator.h>
 #include <sentencepiece_processor.h>
 #include <string>
@@ -6,10 +7,10 @@
 #include <cstring>
 #include <stdexcept>
 #include <cstdio>
-#include <atomic>
 
 #include "defaults.h"
 #include "cli_ui.h"
+#include "cancel.h"
 
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;
@@ -60,6 +61,11 @@ void translate_subtitles(subtitle_list* subtitles, const char *source, const cha
 
     // Translate in batches
     for (size_t offset = 0; offset < subtitles->count; offset += batch_size) {
+        if (is_cancelled()) {
+            fprintf(stderr, "Translation cancelled by user\n");
+            return;
+        }
+
         // Display progress bar
         int progress = offset * 100 / subtitles->count;
         translate_progress_percent.store(progress);

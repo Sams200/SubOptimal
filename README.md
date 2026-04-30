@@ -9,6 +9,7 @@ A fast, lightweight application for generating subtitles using whisper.cpp. Loca
 - **SRT output** - Standard subtitle format ready for use
 - **Translation** - Local text translation using Helsinki-NLB and Facebook NLLB
 - **Validation** - Subtitle validation through Ollama
+- **GUI** - QT6 widgets
 
 ## Requirements
 
@@ -17,6 +18,8 @@ A fast, lightweight application for generating subtitles using whisper.cpp. Loca
 - CMake 3.10+
 - FFmpeg
 - Curl
+- QT6
+- OpenMP
 
 ## Building
 

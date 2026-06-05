@@ -5,6 +5,8 @@
 
 int run_gui(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    app.setApplicationName("suboptimal");
+    app.setDesktopFileName("suboptimal");
     app.setWindowIcon(QIcon(":/assets/suboptimal.png"));
 
     MainWindow w;

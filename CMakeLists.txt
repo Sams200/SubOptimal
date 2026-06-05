@@ -9,6 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Check for Qt6 and enable GUI if available
 find_package(Qt6 COMPONENTS Widgets QUIET)
 if(Qt6_FOUND)
+    set(CMAKE_AUTORCC ON)
     set(WITH_GUI ON)
 else()
     set(WITH_GUI OFF)
@@ -98,6 +99,7 @@ add_executable(suboptimal
 
 if(WITH_GUI)
     target_sources(suboptimal PRIVATE
+        src/ui/resources.qrc
         src/ui/gui.cpp
         src/ui/MainWindow.cpp
         src/ui/PipelineWorker.cpp

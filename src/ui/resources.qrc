@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="assets/suboptimal.png">../../assets/suboptimal.png</file>
+    </qresource>
+</RCC>

@@ -21,6 +21,13 @@ A fast, lightweight application for generating subtitles using whisper.cpp. Loca
 - QT6
 - OpenMP
 
+## Running The AppImage
+Ensure you have CUDA drivers installed and an NVIDIA GPU with at least 4 GB of VRAM
+
+```bash
+./Suboptimal-x86_64.AppImage
+```
+
 ## Building
 
 ```bash

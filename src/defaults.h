@@ -41,6 +41,7 @@ static const char* TRANSCRIBE_MODEL_NAMES[] = {
     "medium.en",
     "large",
     "turbo",
+    "turbo-q5",
     END_OF_ARRAY
 };
 
@@ -55,6 +56,7 @@ static const char* TRANSCRIBE_MODEL_NAMES_FULL[] = {
     "ggml-medium.en.bin",
     "ggml-large-v3.bin",
     "ggml-large-v3-turbo.bin",
+    "ggml-large-v3-turbo-q5_0.bin",
     END_OF_ARRAY
 };
 
@@ -476,21 +478,21 @@ static const char *WHISPER_LANGUAGE_NAMES[] = {
 
 // TRANSLATE ////////////////////////////////////////
 // NLLB model (JustFrederik/nllb-200-distilled-600M-ct2)
-#define NLLB_MODEL_DIR CONFIG_DIR "nllb-200-distilled-600M-ct2/"
+#define NLLB_MODEL_DIR CONFIG_DIR "nllb-200-distilled-600M-ct2-int8/"
 #define NLLB_MODEL_NAME       "model.bin"
-#define NLLB_MODEL_URL        "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/model.bin"
+#define NLLB_MODEL_URL        "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/model.bin"
 #define NLLB_SPM_NAME         "sentencepiece.bpe.model"
-#define NLLB_SPM_URL          "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/sentencepiece.bpe.model"
+#define NLLB_SPM_URL          "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/sentencepiece.bpe.model"
 #define NLLB_CONFIG_NAME      "config.json"
-#define NLLB_CONFIG_URL       "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/config.json"
+#define NLLB_CONFIG_URL       "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/config.json"
 #define NLLB_VOCAB_NAME       "shared_vocabulary.txt"
-#define NLLB_VOCAB_URL        "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/shared_vocabulary.txt"
+#define NLLB_VOCAB_URL        "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/shared_vocabulary.txt"
 #define NLLB_TOKENIZER_NAME   "tokenizer.json"
-#define NLLB_TOKENIZER_URL    "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/tokenizer.json"
+#define NLLB_TOKENIZER_URL    "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/tokenizer.json"
 #define NLLB_TOKENIZER_CFG_NAME "tokenizer_config.json"
-#define NLLB_TOKENIZER_CFG_URL  "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/tokenizer_config.json"
+#define NLLB_TOKENIZER_CFG_URL  "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/tokenizer_config.json"
 #define NLLB_SPECIAL_TOKENS_NAME "special_tokens_map.json"
-#define NLLB_SPECIAL_TOKENS_URL  "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2/resolve/main/special_tokens_map.json"
+#define NLLB_SPECIAL_TOKENS_URL  "https://huggingface.co/JustFrederik/nllb-200-distilled-600M-ct2-int8/resolve/main/special_tokens_map.json"
 
 
 // NLLB TRANSLATION LANGUAGES ////////////////////////////////////////

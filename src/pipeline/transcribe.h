@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "subtitles.h"
+#include "subtitles/subtitles.h"
 
 /*
  * Transcribe audio data and return list of subtitle segments.

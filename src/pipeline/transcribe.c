@@ -5,12 +5,12 @@
 #include "transcribe.h"
 
 #include <stdio.h>
-#include <stdlib.h>
+#include </usr/include/stdlib.h>
 #include <string.h>
-#include <stdatomic.h>
+#include </usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdatomic.h>
 #include "defaults.h"
 #include <whisper.h>
-#include "cli_ui.h"
+#include "cli/cli_ui.h"
 #include "cancel.h"
 
 

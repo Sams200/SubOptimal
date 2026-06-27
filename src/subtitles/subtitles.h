@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#include <stdlib.h>
+#include </usr/include/stdlib.h>
 #include <string.h>
 
 typedef struct {

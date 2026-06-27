@@ -9,7 +9,7 @@
 #include <cstdio>
 
 #include "defaults.h"
-#include "cli_ui.h"
+#include "cli/cli_ui.h"
 #include "cancel.h"
 
 static ctranslate2::Translator *translator = nullptr;

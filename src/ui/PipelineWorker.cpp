@@ -1,11 +1,11 @@
 #include "PipelineWorker.h"
 #include <string>
-#include "cli.h"
-#include "cancel.h"
-#include "transcribe.h"
-#include "translate.h"
-#include "context_check.h"
-#include "subtitles.h"
+#include "cli/cli.h"
+#include "pipeline/cancel.h"
+#include "pipeline/transcribe.h"
+#include "pipeline/translate.h"
+#include "pipeline/context_check.h"
+#include "subtitles/subtitles.h"
 
 PipelineWorker::PipelineWorker(
     const QString &inputPath,

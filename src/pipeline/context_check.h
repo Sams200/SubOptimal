@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "subtitles.h"
+#include "subtitles/subtitles.h"
 
 int context_check_init(const char *ollama_host);
 void context_check_subtitles(

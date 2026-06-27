@@ -4,7 +4,7 @@
 
 #ifndef TRANSLATE_H
 #define TRANSLATE_H
-#include "subtitles.h"
+#include "subtitles/subtitles.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -71,28 +71,36 @@ endif()
 
 add_executable(suboptimal
     src/main.c
-    src/cli.c
-    src/cli.h
-    src/loader.c
-    src/loader.h
-    src/parser.c
-    src/parser.h
     src/defaults.h
-    src/transcribe.c
-    src/transcribe.h
-    src/file_helpers.c
-    src/file_helpers.h
-    src/translate.cpp
-    src/translate.h
-    src/subtitles.h
-    src/context_check.c
-    src/validator.c
-    src/validator.h
-    src/cli_ui.c
-    src/cli_ui.h
-    src/subtitles.c
-    src/cancel.c
-    src/cancel.h
+    
+    src/cli/cli.c
+    src/cli/cli.h
+    src/cli/cli_ui.c
+    src/cli/cli_ui.h
+
+    src/fs/loader.c
+    src/fs/loader.h
+    src/fs/parser.c
+    src/fs/parser.h
+    src/fs/file_helpers.c
+    src/fs/file_helpers.h
+
+    src/pipeline/transcribe.c
+    src/pipeline/transcribe.h
+    src/pipeline/translate.cpp
+    src/pipeline/translate.h
+    src/pipeline/context_check.c
+    src/pipeline/context_check.h
+    src/pipeline/cancel.c
+    src/pipeline/cancel.h
+
+
+
+    src/subtitles/subtitles.c
+    src/subtitles/subtitles.h
+    src/subtitles/validator.c
+    src/subtitles/validator.h
+
     cjson/cJSON.c
     cjson/cJSON.h
 )

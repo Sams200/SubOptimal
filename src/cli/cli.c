@@ -1,16 +1,16 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include </usr/include/stdlib.h>
 #include <limits.h>
 #include <string.h>
 
 #include "cli.h"
 #include "defaults.h"
-#include "loader.h"
-#include "subtitles.h"
-#include "transcribe.h"
-#include "file_helpers.h"
-#include "translate.h"
-#include "context_check.h"
+#include "fs/loader.h"
+#include "subtitles/subtitles.h"
+#include "pipeline/transcribe.h"
+#include "fs/file_helpers.h"
+#include "pipeline/translate.h"
+#include "pipeline/context_check.h"
 
 int write_subtitles_to_file(const char *output_path, const subtitle_list *list) {
     FILE *file = fopen(output_path, "w");

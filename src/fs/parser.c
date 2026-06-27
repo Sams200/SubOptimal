@@ -4,7 +4,7 @@
 #include "argp.h"
 #include "parser.h"
 #include "defaults.h"
-#include <stdlib.h>
+#include </usr/include/stdlib.h>
 #include <string.h>
 #include "file_helpers.h"
 

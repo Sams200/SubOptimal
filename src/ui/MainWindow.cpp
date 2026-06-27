@@ -6,10 +6,10 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include "defaults.h"
-#include "cancel.h"
-#include "transcribe.h"
-#include "translate.h"
-#include "context_check.h"
+#include "pipeline/cancel.h"
+#include "pipeline/transcribe.h"
+#include "pipeline/translate.h"
+#include "pipeline/context_check.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

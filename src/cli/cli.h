@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "parser.h"
-#include "subtitles.h"
+#include "fs/parser.h"
+#include "../subtitles/subtitles.h"
 
 int cli_run(const arguments *args);
 subtitle_list* perform_transcribe(const char *model, const char *source,

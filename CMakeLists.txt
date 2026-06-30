@@ -77,14 +77,14 @@ add_executable(suboptimal
     src/cli/cli.h
     src/cli/cli_ui.c
     src/cli/cli_ui.h
+    src/cli/parser.c
+    src/cli/parser.h
 
-    src/fs/loader.c
-    src/fs/loader.h
-    src/fs/parser.c
-    src/fs/parser.h
     src/fs/file_helpers.c
     src/fs/file_helpers.h
 
+    src/pipeline/loader.c
+    src/pipeline/loader.h
     src/pipeline/transcribe.c
     src/pipeline/transcribe.h
     src/pipeline/translate.cpp
@@ -93,8 +93,6 @@ add_executable(suboptimal
     src/pipeline/context_check.h
     src/pipeline/cancel.c
     src/pipeline/cancel.h
-
-
 
     src/subtitles/subtitles.c
     src/subtitles/subtitles.h
@@ -107,10 +105,10 @@ add_executable(suboptimal
 
 if(WITH_GUI)
     target_sources(suboptimal PRIVATE
-        src/ui/resources.qrc
-        src/ui/gui.cpp
-        src/ui/MainWindow.cpp
-        src/ui/PipelineWorker.cpp
+        src/gui/resources.qrc
+        src/gui/gui.cpp
+        src/gui/MainWindow.cpp
+        src/gui/PipelineWorker.cpp
     )
 endif()
 
@@ -152,6 +150,6 @@ target_include_directories(suboptimal PRIVATE
 
 if(WITH_GUI)
     target_include_directories(suboptimal PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
     )
 endif()

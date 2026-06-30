@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fs/parser.h"
+#include "cli/parser.h"
 #include "cli/cli.h"
 
 #ifdef WITH_GUI

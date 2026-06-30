@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "fs/parser.h"
+#include "cli/parser.h"
 #include "../subtitles/subtitles.h"
 
 int cli_run(const arguments *args);

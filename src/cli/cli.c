@@ -5,7 +5,7 @@
 
 #include "cli.h"
 #include "defaults.h"
-#include "fs/loader.h"
+#include "pipeline/loader.h"
 #include "subtitles/subtitles.h"
 #include "pipeline/transcribe.h"
 #include "fs/file_helpers.h"

@@ -6,7 +6,7 @@
 #include "defaults.h"
 #include </usr/include/stdlib.h>
 #include <string.h>
-#include "file_helpers.h"
+#include "../fs/file_helpers.h"
 
 // argp metadata
 const char *argp_program_version = "SubOptimal 1.0";

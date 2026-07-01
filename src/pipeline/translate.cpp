@@ -4,13 +4,12 @@
 #include <sentencepiece_processor.h>
 #include <string>
 #include <vector>
-#include <cstring>
 #include <stdexcept>
 #include <cstdio>
 
 #include "defaults.h"
-#include "cli/cli_ui.h"
 #include "cancel.h"
+#include "cli/cli.h"
 
 static ctranslate2::Translator *translator = nullptr;
 static sentencepiece::SentencePieceProcessor *spp = nullptr;

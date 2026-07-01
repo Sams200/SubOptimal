@@ -75,8 +75,6 @@ add_executable(suboptimal
     
     src/cli/cli.c
     src/cli/cli.h
-    src/cli/cli_ui.c
-    src/cli/cli_ui.h
     src/cli/parser.c
     src/cli/parser.h
 

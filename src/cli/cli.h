@@ -9,6 +9,7 @@ extern "C" {
 #include "../subtitles/subtitles.h"
 
 int cli_run(const arguments *args);
+void print_progress(int percent);
 
 #ifdef __cplusplus
 }

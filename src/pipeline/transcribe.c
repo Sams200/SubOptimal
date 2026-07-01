@@ -10,8 +10,8 @@
 #include </usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdatomic.h>
 #include "defaults.h"
 #include <whisper.h>
-#include "cli/cli_ui.h"
 #include "cancel.h"
+#include "cli/cli.h"
 
 
 #define MAX_CHUNK_S 20.0f

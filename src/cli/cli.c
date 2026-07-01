@@ -1,8 +1,9 @@
 #include <stdio.h>
 
 #include "cli.h"
-#include "pipeline/context_check.h"
 #include "pipeline/pipeline.h"
+
+
 
 
 int cli_run(const arguments *args) {
@@ -24,15 +25,7 @@ int cli_run(const arguments *args) {
     }
 
     if (args->ollama_model) {
-        context_check_init(args->ollama_host);
-
-        if (translated_list) {
-            context_check_subtitles(original_list, translated_list, args->ollama_model);
-        } else {
-            context_check_subtitles(original_list, NULL, args->ollama_model);
-        }
-
-        context_check_free();
+        context_check(args->ollama_host, args->ollama_model,original_list,translated_list);
     }
 
     if (translated_list) {

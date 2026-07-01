@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <limits.h>
 
+#include "context_check.h"
 #include "defaults.h"
 #include "loader.h"
 #include "transcribe.h"
@@ -124,4 +125,16 @@ void perform_translate(subtitle_list *list, const char *target_nllb, int *error)
         translate_subtitles(list, source_nllb, target_nllb);
     }
     translator_free();
+}
+
+void context_check(const char* ollama_host, const char* ollama_model, subtitle_list *original_list,subtitle_list *translated_list){
+    context_check_init(ollama_host);
+
+    if (translated_list) {
+        context_check_subtitles(original_list, translated_list, ollama_model);
+    } else {
+        context_check_subtitles(original_list, NULL, ollama_model);
+    }
+
+    context_check_free();
 }

@@ -1,7 +1,6 @@
 #include "PipelineWorker.h"
 #include <string>
 #include "pipeline/cancel.h"
-#include "pipeline/context_check.h"
 #include "pipeline/pipeline.h"
 #include "subtitles/subtitles.h"
 
@@ -76,15 +75,7 @@ void PipelineWorker::process() {
     }
 
     if (m_contextCheck) {
-        context_check_init(ollamaHost.c_str());
-
-        if (translated) {
-            context_check_subtitles(original, translated, ollamaModel.c_str());
-        } else {
-            context_check_subtitles(original, NULL, ollamaModel.c_str());
-        }
-
-        context_check_free();
+        context_check(ollamaHost.c_str(), ollamaModel.c_str(), original, translated);
     }
 
     if (is_cancelled()) {

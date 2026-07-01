@@ -18,12 +18,6 @@ extern "C" {
     void translator_init(const char *model_path, const char *spm_path);
 
     /*
-     * Translate text from source to target language.
-     * Returns allocated string (caller must free).
-     */
-    char *translator_translate(const char *text, const char *source, const char *target);
-
-    /*
      * Translate a subtitle list from source to target language.
      * Performs in-place translation
      */

@@ -14,22 +14,6 @@
 #include "translate.h"
 #include "fs/file_helpers.h"
 
-int write_subtitles_to_file(const char *output_path, const subtitle_list *list) {
-    FILE *file = fopen(output_path, "w");
-    if (!file) {
-        fprintf(stderr, "CLI: Failed to open output file '%s'\n", output_path);
-        return -1;
-    }
-    for (int i = 0; i < (int)list->count; i++) {
-        if (list->segments[i].text[0] == '*')
-            continue;
-        fprintf(file, "%d\n%s --> %s\n%s\n\n",
-                i + 1, list->segments[i].t0, list->segments[i].t1, list->segments[i].text);
-    }
-    fclose(file);
-    return 0;
-}
-
 subtitle_list *perform_transcribe(const char *model, const char *source,
                                   const char *language, int *error) {
     *error = 0;

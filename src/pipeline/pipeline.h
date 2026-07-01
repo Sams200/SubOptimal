@@ -14,7 +14,6 @@ extern "C" {
     subtitle_list* perform_transcribe(const char *model, const char *source,
                                       const char *language, int *error);
     void perform_translate(subtitle_list *list, const char *target_nllb, int *error);
-    int write_subtitles_to_file(const char *output_path, const subtitle_list *list);
     void context_check(const char* ollama_host, const char* ollama_model, subtitle_list *original_list,subtitle_list *translated_list);
 #ifdef __cplusplus
 }

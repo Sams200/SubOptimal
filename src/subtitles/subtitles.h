@@ -28,6 +28,7 @@ typedef struct {
 
 subtitle_list* duplicate_list(subtitle_list* list);
 void free_subtitle_list(subtitle_list *list);
+int write_subtitles_to_file(const char *output_path, const subtitle_list *list);
 
 #ifdef __cplusplus
 }

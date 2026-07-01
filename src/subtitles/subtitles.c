@@ -4,6 +4,8 @@
 
 #include "subtitles.h"
 
+#include <stdio.h>
+
 subtitle_list* duplicate_list(subtitle_list* list) {
     if(!list) return NULL;
     subtitle_list* new_list = (subtitle_list*)malloc(sizeof(subtitle_list));
@@ -29,4 +31,20 @@ void free_subtitle_list(subtitle_list *list) {
     }
     free(list->segments);
     free(list);
+}
+
+int write_subtitles_to_file(const char *output_path, const subtitle_list *list) {
+    FILE *file = fopen(output_path, "w");
+    if (!file) {
+        fprintf(stderr, "CLI: Failed to open output file '%s'\n", output_path);
+        return -1;
+    }
+    for (int i = 0; i < (int)list->count; i++) {
+        if (list->segments[i].text[0] == '*')
+            continue;
+        fprintf(file, "%d\n%s --> %s\n%s\n\n",
+                i + 1, list->segments[i].t0, list->segments[i].t1, list->segments[i].text);
+    }
+    fclose(file);
+    return 0;
 }

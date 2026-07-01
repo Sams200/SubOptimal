@@ -1,10 +1,8 @@
 #include "PipelineWorker.h"
 #include <string>
-#include "cli/cli.h"
 #include "pipeline/cancel.h"
-#include "pipeline/transcribe.h"
-#include "pipeline/translate.h"
 #include "pipeline/context_check.h"
+#include "pipeline/pipeline.h"
 #include "subtitles/subtitles.h"
 
 PipelineWorker::PipelineWorker(

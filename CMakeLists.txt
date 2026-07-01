@@ -101,6 +101,8 @@ add_executable(suboptimal
 
     cjson/cJSON.c
     cjson/cJSON.h
+src/pipeline/pipeline.c
+src/pipeline/pipeline.h
 )
 
 if(WITH_GUI)

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Suboptimal
+Exec=suboptimal
+Icon=suboptimal
+Type=Application
+Categories=Utility;Development;
+Comment=Subtitle Generation Tool

@@ -4,5 +4,6 @@ plan.txt
 .directory
 test_videos
 AGENTS.md
-AppDir
+AppDir/usr/lib
 *.AppImage
+

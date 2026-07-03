@@ -1,4 +1,4 @@
-
+LibriSpeech 500/2600
 ========== EVALUATION SUMMARY ==========
 Files processed: 500
 Mean WER:        5.10%
@@ -6,7 +6,7 @@ Std Dev:         11.18%
 Min WER:         0.00%
 Max WER:         66.67%
 ======================================
-
+Flores+ eng->spa
 ========== EVALUATION SUMMARY ==========
 Sentences processed: 1012
 Corpus BLEU:         24.41

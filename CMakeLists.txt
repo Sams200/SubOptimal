@@ -153,3 +153,19 @@ if(WITH_GUI)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
     )
 endif()
+
+option(BUILD_EVALUATION_TOOLS "Build ASR evaluation tools (requires Python3)" OFF)
+
+if(BUILD_EVALUATION_TOOLS)
+    # Ensure whisper is built before eval
+    if(NOT TARGET whisper)
+        message(FATAL_ERROR "whisper target not found")
+    endif()
+    add_subdirectory(eval/asr)
+endif()
+
+option(BUILD_NMT_EVALUATION "Build NMT evaluation tools" OFF)
+
+if(BUILD_NMT_EVALUATION)
+    add_subdirectory(eval/nmt)
+endif()

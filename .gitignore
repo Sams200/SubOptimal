@@ -3,7 +3,9 @@ cmake*
 plan.txt
 .directory
 test_videos
-AGENTS.md
 AppDir/usr/lib
 *.AppImage
-
+*.tar.gz
+LibriSpeech
+*.tsv
+eval/nmt/data

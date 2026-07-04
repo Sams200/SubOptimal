@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; !is_end_of_array(TRANSCRIBE_MODEL_NAMES[i]); i++) {
         m_modelCombo->addItem(TRANSCRIBE_MODEL_NAMES[i], i);
     }
-    m_modelCombo->setCurrentIndex(3); // base.en
+    m_modelCombo->setCurrentIndex(10); // turbo_q5
 
     // Source language dropdown
     m_sourceLanguageCombo = new QComboBox(this);

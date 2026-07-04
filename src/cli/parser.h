@@ -5,7 +5,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#define DEFAULT_MODEL  "ggml-base.en.bin"
+#define DEFAULT_MODEL  "turbo-q5"
 #define DEFAULT_OUTPUT "./output.srt"
 
 // Run mode: headless (CLI/config) or GUI

@@ -1,16 +1,56 @@
-LibriSpeech 500/2600
-========== EVALUATION SUMMARY ==========
-Files processed: 500
-Mean WER:        5.10%
-Std Dev:         11.18%
-Min WER:         0.00%
-Max WER:         66.67%
-======================================
-Flores+ eng->spa
-========== EVALUATION SUMMARY ==========
-Sentences processed: 1012
-Corpus BLEU:         24.41
-Avg Sentence BLEU:   19.93
-Total time:          48.16s
-Sentences/sec:       21.01
-======================================
+% Benchmark results
+% LibriSpeech 500/2600
+
+% Base
+% ========== EVALUATION SUMMARY ==========
+% Files processed: 500
+% Mean WER:        5.96%
+% Std Dev:         12.02%
+% Min WER:         0.00%
+% Max WER:         150.00%
+% ======================================
+
+% Small
+% ========== EVALUATION SUMMARY ==========
+% Files processed: 500
+% Mean WER:        4.42%
+% Std Dev:         11.33%
+% Min WER:         0.00%
+% Max WER:         150.00%
+% ======================================
+
+% Medium
+% ========== EVALUATION SUMMARY ==========
+% Files processed: 500
+% Mean WER:        3.85%
+% Std Dev:         10.37%
+% Min WER:         0.00%
+% Max WER:         100.00%
+% ======================================
+
+% Turbo
+% ========== EVALUATION SUMMARY ==========
+% Files processed: 500
+% Mean WER:        5.10%
+% Std Dev:         11.18%
+% Min WER:         0.00%
+% Max WER:         66.67%
+% ======================================
+
+% Turbo_q5
+% ========== EVALUATION SUMMARY ==========
+% Files processed: 500
+% Mean WER:        5.01%
+% Std Dev:         10.86%
+% Min WER:         0.00%
+% Max WER:         66.67%
+% ======================================
+
+% Flores+ eng->spa
+% ========== EVALUATION SUMMARY ==========
+% Sentences processed: 1012
+% Corpus BLEU:         24.41
+% Avg Sentence BLEU:   19.93
+% Total time:          48.16s
+% Sentences/sec:       21.01
+% ======================================

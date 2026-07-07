@@ -72,11 +72,12 @@ git submodule update --init --recursive
 
 | Model | Size | Speed | Accuracy |
 |-------|------|-------|----------|
-| `tiny` | 75 MB | Fastest | Basic |
-| `base` | 142 MB | Fast | Good |
-| `small` | 466 MB | Medium | Better |
-| `medium` | 1.5 GB | Medium | High |
-| `turbo` | 1.5 GB | Large | Highest |
+| `tiny` | 75 MiB | Fastest | Basic |
+| `base` | 142 MiB | Fast | Good |
+| `small` | 466 MiB | Medium | Better |
+| `medium` | 1.5 GiB | Medium | High |
+| `turbo` | 1.5 GiB | Slow | Highest |
+| `turbo-q5` | 550 MiB | Fast | High |
 
 English-only models (`.en`) are more performant for English audio.
 
@@ -88,7 +89,7 @@ SubOptimal stores configuration and models in `~/.local/share/SubOptimal/`.
 
 ```yaml
 # SubOptimal configuration
-model:  ggml-base.en.bin
+model:  turbo-q5
 source: ""
 output: transcript.srt
 ```

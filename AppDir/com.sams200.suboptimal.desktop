@@ -5,3 +5,4 @@ Icon=suboptimal
 Type=Application
 Categories=Utility;Development;
 Comment=Subtitle Generation Tool
+X-AppImage-Name=suboptimal

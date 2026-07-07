@@ -4,6 +4,7 @@ plan.txt
 .directory
 test_videos
 AppDir/usr/lib
+AppDir/usr/bin
 *.AppImage
 *.tar.gz
 LibriSpeech

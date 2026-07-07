@@ -4,6 +4,7 @@
 #include <QIcon>
 
 int run_gui(int argc, char *argv[]) {
+    QGuiApplication::setDesktopFileName("com.sams200.suboptimal");
     QApplication app(argc, argv);
     app.setApplicationName("suboptimal");
     app.setDesktopFileName("suboptimal");

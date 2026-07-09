@@ -1,5 +1,5 @@
 #include "cancel.h"
-#include </usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdatomic.h>
+#include <stdatomic.h>
 
 static atomic_int cancel_flag = 0;
 

@@ -16,6 +16,7 @@ A fast, lightweight application for generating subtitles using whisper.cpp. Loca
 - Linux with CUDA-capable GPU
 - NVIDIA drivers and CUDA toolkit
 - CMake 3.10+
+- Ninja 1.13+
 - FFmpeg
 - Curl
 - QT6
@@ -37,7 +38,11 @@ cd SubOptimal
 
 # Build
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
+cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_MAKE_PROGRAM=ninja \
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+      -G Ninja \
+      ..
 cmake --build . -j$(nproc)
 ```
 

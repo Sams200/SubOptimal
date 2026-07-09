@@ -3,7 +3,7 @@
 #include </usr/include/stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include </usr/lib/gcc/x86_64-pc-linux-gnu/16.1.1/include/stdatomic.h>
+#include <stdatomic.h>
 #include <curl/curl.h>
 #include "subtitles/validator.h"
 #include "defaults.h"

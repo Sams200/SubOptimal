@@ -41,6 +41,7 @@ mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_MAKE_PROGRAM=ninja \
       -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+      -DBUILD_CLI=OFF \
       -G Ninja \
       ..
 cmake --build . -j$(nproc)
